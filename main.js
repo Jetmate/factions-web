@@ -5,6 +5,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 // import http from 'http'
 
+// import session from 'express-session'
+
 
 var _helmet = require('helmet');
 
@@ -22,9 +24,9 @@ var _hbs = require('hbs');
 
 var _hbs2 = _interopRequireDefault(_hbs);
 
-var _expressSession = require('express-session');
+var _cookieSession = require('cookie-session');
 
-var _expressSession2 = _interopRequireDefault(_expressSession);
+var _cookieSession2 = _interopRequireDefault(_cookieSession);
 
 var _bodyParser = require('body-parser');
 
@@ -99,9 +101,10 @@ app.set('views', __dirname + '/www');
 
 app.use((0, _helmet2.default)());
 // app.use(compression())
-app.use((0, _expressSession2.default)({ secret: 'KV8t4Bhvq4FAIwj7' }));
 app.use(_bodyParser2.default.json());
 app.use(_bodyParser2.default.urlencoded({ extended: true }));
+// app.use(session({ secret: 'KV8t4Bhvq4FAIwj7', saveUninitialized: false, resave: true}))
+app.use((0, _cookieSession2.default)({ keys: ['asdf', 'vj32fd', '3jadva3'] }));
 
 app.get('/', function (req, res, next) {
   // if ('id' in req.session) {
@@ -111,11 +114,17 @@ app.get('/', function (req, res, next) {
   // }
 });
 
+app.post('/signup', function (req, res, next) {
+  req.session.name = req.body.id;
+  p(req.session.name);
+  res.redirect('/game');
+});
+
 app.get('/game', function (req, res, next) {
-  req.session.name = 'man'; //req.body.id
+  p(req.session.name);
   res.render('index.html', {
     component: 'game',
-    id: 'man',
+    id: req.session.name,
     coords: JSON.stringify(randomCoords()),
     grid: JSON.stringify(grid),
     GRID_WIDTH: GRID_WIDTH,
@@ -128,7 +137,19 @@ app.use(_express2.default.static('www'));
 p('RUNNING ON http://127.0.0.1:3000/');
 
 io.on('connection', function (socket) {
-  socket.on('action', function (data) {
-    socket.broadcast.emit('action', data);
+  socket.on('action', function (id, action) {
+    socket.broadcast.emit('action', id, action);
+  });
+
+  socket.on('new', function (id, coords) {
+    socket.broadcast.emit('new', id, coords);
+  });
+
+  socket.on('player', function (id, coords) {
+    socket.broadcast.emit('player', id, coords);
+  });
+
+  socket.on('close', function (id) {
+    socket.broadcast.emit('close', id);
   });
 });

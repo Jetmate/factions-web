@@ -4,7 +4,8 @@ import express from 'express'
 // import http from 'http'
 import socketio from 'socket.io'
 import handlebars from 'hbs'
-import session from 'express-session'
+// import session from 'express-session'
+import cookieSession from 'cookie-session'
 import bodyParser from 'body-parser'
 
 function p (...items) {
@@ -72,10 +73,10 @@ app.set('views', __dirname + '/www')
 
 app.use(helmet())
 // app.use(compression())
-app.use(session({ secret: 'KV8t4Bhvq4FAIwj7'}))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
-
+// app.use(session({ secret: 'KV8t4Bhvq4FAIwj7', saveUninitialized: false, resave: true}))
+app.use(cookieSession({keys: ['asdf', 'vj32fd', '3jadva3']}))
 
 app.get('/', (req, res, next) => {
   // if ('id' in req.session) {
@@ -85,11 +86,17 @@ app.get('/', (req, res, next) => {
   // }
 })
 
-app.get('/game', (req, res, next) => { 
-  req.session.name = 'man'//req.body.id
+app.post('/signup', (req, res, next) => {
+  req.session.name = req.body.id
+  p(req.session.name)
+  res.redirect('/game')
+})
+
+app.get('/game', (req, res, next) => {
+  p(req.session.name)
   res.render('index.html', {
     component: 'game', 
-    id: 'man', 
+    id: req.session.name, 
     coords: JSON.stringify(randomCoords()), 
     grid: JSON.stringify(grid),
     GRID_WIDTH: GRID_WIDTH,
@@ -104,7 +111,19 @@ p('RUNNING ON http://127.0.0.1:3000/')
 
 
 io.on('connection', (socket) => {
-  socket.on('action', (data) => {
-    socket.broadcast.emit('action', data)
+  socket.on('action', (id, action) => {
+    socket.broadcast.emit('action', id, action)
+  })
+
+  socket.on('new', (id, coords) => {
+    socket.broadcast.emit('new', id, coords)
+  })
+
+  socket.on('player', (id, coords) => {
+    socket.broadcast.emit('player', id, coords)
+  })
+
+  socket.on('close', (id) => {
+    socket.broadcast.emit('close', id)
   })
 })

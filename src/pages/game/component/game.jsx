@@ -61,15 +61,15 @@ function findCenter (size1, size2, coords) {
 
 function withinBounds (coords, size) {
   return (
-    coords[0] >= 0 && coords[0] + size[0] < WIDTH &&
-    coords[1] >= 0 && coords[1] + size[1] < HEIGHT
+    coords[0] >= 0 && coords[0] + size[0] <= WIDTH &&
+    coords[1] >= 0 && coords[1] + size[1] <= HEIGHT
   )
 }
 
 
 class Component extends React.Component {
   // UPDATE_WAIT = 33
-  UPDATE_WAIT = 0
+  UPDATE_WAIT = 33
 
   // ARROW KEYS
   // KEY_RIGHT = 39
@@ -106,10 +106,38 @@ class Component extends React.Component {
       const playerSprite = spriteSheet.getSprite(12, 6, true)      
       let updateTime = 0
       let grid = JSON.parse(window.grid)
-      let player = new Player(JSON.parse(window.coords), playerSprite, [playerSprite.width, playerSprite.height])
+      let player = new Player(convertFromGrid(JSON.parse(window.coords)), playerSprite)
       let opponents = []
+      
 
-      this.initInput(ctx, grid, player)
+      this.props.socket.emit('new', window.id, player.coords)
+
+      this.props.socket.on('player', (id, coords) => {
+        opponents[id] = new Player(coords, playerSprite)
+        console.log('OPPONENTS', opponents)
+        console.log('RECEIVED PLAYER:', id) 
+      })
+
+
+      this.props.socket.on('new', (id, coords) => {
+        opponents[id] = new Player(coords, playerSprite)
+        console.log('OPPONENTS', opponents)
+        console.log('NEW PLAYER:', id)
+        this.props.socket.emit('player', window.id, player.coords)
+      })
+
+      this.props.socket.on('close', (id) => {
+        console.log('CLOSE', id)
+        delete opponents[id]
+      })
+
+      this.props.socket.on('action', (id, action) => {
+        console.log('OPPONENTS', opponents)
+        console.log('ACTION:', id)
+        opponents[id].setAction(action)
+      })
+
+      this.initInput(ctx, grid, player  )
 
       this.update = (timestamp) => {
         if (timestamp - updateTime > this.UPDATE_WAIT) {
@@ -126,12 +154,17 @@ class Component extends React.Component {
 
   main = (ctx, grid, player, opponents) => {
     player.execute(grid)
-    // opponent.execute(grid)
+
+    for (let id in opponents) {
+      opponents[id].execute(grid) 
+    }
     
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
 
     player.draw(ctx)
-    // opponent.draw(player.generateDisplayCoords)
+    for (let id in opponents) {
+      opponents[id].draw(ctx, player.generateDisplayCoords)
+    }
     this.drawOutline(ctx, player.generateDisplayCoords)
     this.drawGrid(ctx, grid, player.generateDisplayCoords)
   }
@@ -156,7 +189,8 @@ class Component extends React.Component {
         default:
           return
       }
-      this.props.socket.emit('action', action)
+      this.props.socket.emit('action', window.id, action)
+      // p(action)
       player.setAction(action)
     })
 
@@ -179,14 +213,8 @@ class Component extends React.Component {
         default:
           return
       }
-      this.props.socket.emit('action', action)
+      this.props.socket.emit('action', window.id, action)
       player.setAction(action)
-    })
-  }
-
-  initOpponent = (ctx, grid, opponent) => {
-    this.props.socket.on('action', (action) => {
-      opponent.setAction(action)
     })
   }
 
@@ -222,12 +250,12 @@ class Component extends React.Component {
 
 
 class Player {
-  SPEED = 5 
+  SPEED = 5
 
-  constructor (gridCoords, sprite, size) {
+  constructor (coords, sprite, size) {
     this.sprite = sprite
-    this.size = size
-    this.coords = findCenter([BLOCK_WIDTH, BLOCK_WIDTH], size, convertFromGrid(gridCoords))
+    this.size = [sprite.width, sprite.height]
+    this.coords = findCenter([BLOCK_WIDTH, BLOCK_WIDTH], this.size, coords)
     this.fakeCoords = findCenter([WIDTH, HEIGHT], this.size)
     this.velocity = [0, 0]
   }
@@ -282,7 +310,7 @@ class Player {
         if (withinBounds(newCoords, this.size)) {
           this.coords[i] = newCoords[i]
         }
-        let gridCoords = findAllGridCoords(newCoords, this.size)
+        // let gridCoords = findAllGridCoords(newCoords, this.size)
       }
     }
   }
