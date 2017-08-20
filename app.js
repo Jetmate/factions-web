@@ -82,7 +82,7 @@ app.get('/', (req, res, next) => {
   // if ('id' in req.session) {
   //   res.render('index.html', {component: 'extraTab'})
   // } else {
-    res.render('index.html', {component: 'setup'})
+  res.render('index.html', {component: 'setup'})
   // }
 })
 
@@ -93,15 +93,18 @@ app.post('/signup', (req, res, next) => {
 })
 
 app.get('/game', (req, res, next) => {
-  p(req.session.name)
-  res.render('index.html', {
-    component: 'game', 
-    id: req.session.name, 
-    coords: JSON.stringify(randomCoords()), 
-    grid: JSON.stringify(grid),
-    GRID_WIDTH: GRID_WIDTH,
-    GRID_HEIGHT: GRID_HEIGHT
-  })
+  if (typeof req.session.name === 'undefined') {
+    res.redirect('/')
+  } else {
+    res.render('index.html', {
+      component: 'game', 
+      id: req.session.name, 
+      coords: JSON.stringify(randomCoords()), 
+      grid: JSON.stringify(grid),
+      GRID_WIDTH: GRID_WIDTH,
+      GRID_HEIGHT: GRID_HEIGHT
+    })
+  }
 })
 
 app.use(express.static('www'))

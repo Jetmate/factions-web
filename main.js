@@ -121,15 +121,18 @@ app.post('/signup', function (req, res, next) {
 });
 
 app.get('/game', function (req, res, next) {
-  p(req.session.name);
-  res.render('index.html', {
-    component: 'game',
-    id: req.session.name,
-    coords: JSON.stringify(randomCoords()),
-    grid: JSON.stringify(grid),
-    GRID_WIDTH: GRID_WIDTH,
-    GRID_HEIGHT: GRID_HEIGHT
-  });
+  if (typeof req.session.name === 'undefined') {
+    res.redirect('/');
+  } else {
+    res.render('index.html', {
+      component: 'game',
+      id: req.session.name,
+      coords: JSON.stringify(randomCoords()),
+      grid: JSON.stringify(grid),
+      GRID_WIDTH: GRID_WIDTH,
+      GRID_HEIGHT: GRID_HEIGHT
+    });
+  }
 });
 
 app.use(_express2.default.static('www'));
