@@ -4,11 +4,12 @@ import SpriteSheet from './SpriteSheet.js'
 
 const GRID_WIDTH = window.GRID_WIDTH
 const GRID_HEIGHT = window.GRID_HEIGHT
-const SCALE_FACTOR = 10
-const BLOCK_WIDTH = 16 * SCALE_FACTOR 
-const WIDTH = 100
-const HEIGHT = 100
-
+const SCALE_FACTOR = 3
+const BLOCK_WIDTH = 16 
+const WIDTH = GRID_WIDTH * BLOCK_WIDTH
+const HEIGHT = GRID_HEIGHT * BLOCK_WIDTH
+const CANVAS_WIDTH = window.innerWidth
+const CANVAS_HEIGHT = window.innerHeight
 
 function opposite (number) {
   return Math.abs(number - 1)
@@ -41,8 +42,8 @@ function findAllGridCoords (coords, size) {
   return allCoords
 }
 
-function convertFromGrid (x, y) {
-  return [x * BLOCK_WIDTH, y * BLOCK_WIDTH]
+function convertFromGrid (coords) {
+  return [coords[0] * BLOCK_WIDTH, coords[1] * BLOCK_WIDTH]
 }
 
 function findCenter (size1, size2, coords) {
@@ -58,19 +59,17 @@ function findCenter (size1, size2, coords) {
   ]
 }
 
-function withinBounds (coords, grid) {
-  for (let i = 0; i < coords.length; i++) {
-    if (grid[coords[i][0]] === undefined || grid[coords[i][0]][coords[i][1]] === undefined) {
-      return false
-    }
-  }
-  return true
+function withinBounds (coords, size) {
+  return (
+    coords[0] >= 0 && coords[0] + size[0] < WIDTH &&
+    coords[1] >= 0 && coords[1] + size[1] < HEIGHT
+  )
 }
 
 
 class Component extends React.Component {
   // UPDATE_WAIT = 33
-  UPDATE_WAIT = 1000
+  UPDATE_WAIT = 0
 
   // ARROW KEYS
   // KEY_RIGHT = 39
@@ -84,6 +83,8 @@ class Component extends React.Component {
   KEY_UP = 87
   KEY_DOWN = 83
 
+  GRID_COLOR = '#8e8e8e'
+
   render () {
     return (
       <canvas ref={this.init}>Looks like your browser does not support the JS canvas. yikes.</canvas>
@@ -91,8 +92,8 @@ class Component extends React.Component {
   }
 
   init = (canvas) => {
-    canvas.width = WIDTH * SCALE_FACTOR
-    canvas.height = HEIGHT * SCALE_FACTOR
+    canvas.width = CANVAS_WIDTH
+    canvas.height = CANVAS_HEIGHT
     const ctx = canvas.getContext('2d')
     ctx.imageSmoothingEnabled = false
     ctx.scale(SCALE_FACTOR, SCALE_FACTOR)
@@ -125,14 +126,13 @@ class Component extends React.Component {
 
   main = (ctx, grid, player, opponents) => {
     player.execute(grid)
-    p(player.coords)
     // opponent.execute(grid)
     
-    ctx.clearRect(0, 0, WIDTH, HEIGHT)
+    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
 
     player.draw(ctx)
     // opponent.draw(player.generateDisplayCoords)
-    // this.drawOutline()
+    this.drawOutline(ctx, player.generateDisplayCoords)
     this.drawGrid(ctx, grid, player.generateDisplayCoords)
   }
 
@@ -190,25 +190,30 @@ class Component extends React.Component {
     })
   }
 
-  // drawOutline = (ctx, coordsFunc) => {
-  //   ctx.beginPath()
-  //   ctx.strokeStyle = this.GRID_COLOR
-  //   for (let x = 0; x <= GRID_WIDTH; x++) {
-  //     ctx.moveTo(x * this.BLOCK_WIDTH, 0)
-  //     ctx.lineTo(x * this.BLOCK_WIDTH, HEIGHT)
-  //   }
-  //   for (let y = 0; y <= GRID_HEIGHT; y++) {
-  //     ctx.moveTo(0, y * this.BLOCK_WIDTH)
-  //     ctx.lineTo(WIDTH, y * this.BLOCK_WIDTH)
-  //   }
-  //   ctx.stroke()
-  // }
+  drawOutline = (ctx, coordsFunc) => {
+    ctx.beginPath()
+    ctx.strokeStyle = this.GRID_COLOR
+    let begin, end
+    for (let x = 0; x <= GRID_WIDTH; x++) {
+      begin = coordsFunc([x * BLOCK_WIDTH, 0])
+      end = coordsFunc([x * BLOCK_WIDTH, HEIGHT])
+      ctx.moveTo(begin[0], begin[1])
+      ctx.lineTo(end[0], end[1])
+    }
+    for (let y = 0; y <= GRID_HEIGHT; y++) {
+      begin = coordsFunc([0, y * BLOCK_WIDTH])
+      end = coordsFunc([WIDTH, y * BLOCK_WIDTH])
+      ctx.moveTo(begin[0], begin[1])
+      ctx.lineTo(end[0], end[1])
+    }
+    ctx.stroke()
+  }
 
   drawGrid = (ctx, grid, coordsFunc) => {
     for (let x = 0; x < GRID_WIDTH; x++) {
       for (let y = 0; y < GRID_HEIGHT; y++) {
         if (grid[x][y]) {
-          ctx.drawImage(this.sprites[grid[x][y]], coordsFunc(convertFromGrid(x, y)))
+          ctx.drawImage(this.sprites[grid[x][y]], coordsFunc(convertFromGrid([x, y])))
         }
       }
     }
@@ -222,7 +227,7 @@ class Player {
   constructor (gridCoords, sprite, size) {
     this.sprite = sprite
     this.size = size
-    this.coords = findCenter([BLOCK_WIDTH, BLOCK_WIDTH], size, gridCoords)
+    this.coords = findCenter([BLOCK_WIDTH, BLOCK_WIDTH], size, convertFromGrid(gridCoords))
     this.fakeCoords = findCenter([WIDTH, HEIGHT], this.size)
     this.velocity = [0, 0]
   }
@@ -270,16 +275,19 @@ class Player {
   }
 
   execute (grid) {
-    if (this.velocity[0] || this.velocity[1]) {
-      let newCoords = [this.coords[0] + this.velocity[0], this.coords[1] + this.velocity[1]]
-      let gridCoords = findAllGridCoords(newCoords, this.size)
-      if (withinBounds(gridCoords, grid)) {
-        this.coords = newCoords
+    for (let i = 0; i < 2; i++) {
+      if (this.velocity[i]) {
+        let newCoords = this.coords.slice()
+        newCoords[i] += this.velocity[i]
+        if (withinBounds(newCoords, this.size)) {
+          this.coords[i] = newCoords[i]
+        }
+        let gridCoords = findAllGridCoords(newCoords, this.size)
       }
     }
   }
 
-  generateDisplayCoords (coords) {
+  generateDisplayCoords = (coords) => {
     return [
       coords[0] + this.fakeCoords[0] - this.coords[0],
       coords[1] + this.fakeCoords[1] - this.coords[1]
@@ -292,12 +300,7 @@ class Player {
       ctx.drawImage(this.sprite, x, y)
       return
     }
-    console.log('size', this.size, 'coords', this.fakeCoords, HEIGHT, WIDTH)
     ctx.drawImage(this.sprite, this.fakeCoords[0], this.fakeCoords[1])
-    // ctx.fillStyle="#FF0000"
-    // ctx.fillRect(this.fakeCoords[0], this.fakeCoords[1], this.size[0], this.size[1])
-    // ctx.fillRect(10, 10, 10, 10)
-
   }
 }
 
