@@ -62,67 +62,67 @@ function withinBounds (coords, size) {
 class Player {
   SPEED = 5
 
-  constructor (coords, sprite, size) {
+  constructor (coords, sprite) {
     this.sprite = sprite
     this.size = [sprite.width, sprite.height]
     this.coords = findCenter([BLOCK_WIDTH, BLOCK_WIDTH], this.size, coords)
     this.fakeCoords = findCenter([CANVAS_WIDTH / 3, CANVAS_HEIGHT / 3], this.size)
     this.velocity = [0, 0]
+    this.directions = {'RIGHT': false, 'LEFT': false, 'UP': false, 'DOWN': false}
   }
 
-  setAction (action) {
-    let actionType = action.split('-')[0]
-    switch (actionType) {
-      case 'MOVE': {
-        switch (action) {
-          case 'MOVE-RIGHT': {
-            this.velocity[0] = this.SPEED
-            break
-          }
-          case 'MOVE-LEFT': {
-            this.velocity[0] = -this.SPEED
-            break
-          }
-          case 'MOVE-UP': {
-            this.velocity[1] = -this.SPEED
-            break
-          }
-          case 'MOVE-DOWN': {
-            this.velocity[1] = this.SPEED
-            break
-          }
-        }
+  move (direction) {
+    switch (direction) {
+      case 'RIGHT': {
+        this.velocity[0] = this.SPEED
+        this.directions['RIGHT'] = true
         break
       }
-      case 'UNMOVE': {
-        switch (action) {
-          case 'UNMOVE-RIGHT':
-          case 'UNMOVE-LEFT': {
-            this.velocity[0] = 0
-            break
-          }
-          case 'UNMOVE-UP':
-          case 'UNMOVE-DOWN': {
-            this.velocity[1] = 0
-            break
-          }
-        }
+      case 'LEFT': {
+        this.velocity[0] = -this.SPEED
+        this.directions['LEFT'] = true
         break
       }
+      case 'UP': {
+        this.velocity[1] = -this.SPEED
+        this.directions['UP'] = true
+        break
+      }
+      case 'DOWN': {
+        this.velocity[1] = this.SPEED
+        this.directions['DOWN'] = true
+        break
+      } 
     }
   }
 
-  execute (grid) {
-    for (let i = 0; i < 2; i++) {
-      if (this.velocity[i]) {
-        let newCoords = this.coords.slice()
-        newCoords[i] += this.velocity[i]
-        if (withinBounds(newCoords, this.size)) {
-          this.coords[i] = newCoords[i]
-        }
-        // let gridCoords = findAllGridCoords(newCoords, this.size)
+  unmove (direction) {
+    switch (direction) {
+      case 'RIGHT': {
+        this.velocity[0] = (this.directions['LEFT'] ? -this.SPEED : 0)
+        this.directions['RIGHT'] = false
+        break
       }
+      case 'LEFT': {
+        this.velocity[0] = (this.directions['RIGHT'] ? this.SPEED : 0)
+        this.directions['LEFT'] = false
+        break
+      }
+      case 'UP': {
+        this.velocity[1] = (this.directions['DOWN'] ? this.SPEED : 0)
+        this.directions['UP'] = false
+        break
+      }
+      case 'DOWN': {
+        this.velocity[1] = (this.directions['UP'] ? -this.SPEED : 0)
+        this.directions['DOWN'] = false
+        break
+      } 
     }
+  }
+
+  draw (ctx) {
+    ctx.drawImage(this.sprite, this.fakeCoords[0], this.fakeCoords[1])
   }
 
   generateDisplayCoords = (coords) => {
@@ -132,33 +132,60 @@ class Player {
     ]
   }
 
-  draw (ctx, coordsFunc) {
-    if (coordsFunc) {
-      let [x, y] = coordsFunc(this.coords)
-      ctx.drawImage(this.sprite, x, y)
-      return
+  execute (grid, socket) {
+    let oldCoords = this.coords.slice()
+    for (let i = 0; i < 2; i++) {
+      if (this.velocity[i]) {
+        let newCoords = this.coords.slice()
+        newCoords[i] += this.velocity[i]
+        if (withinBounds(newCoords, this.size)) {
+          this.coords[i] = newCoords[i]
+        }
+      }
     }
-    ctx.drawImage(this.sprite, this.fakeCoords[0], this.fakeCoords[1])
+
+    if (this.coords[0] !== oldCoords[0] || this.coords[1] !== oldCoords[1]) {
+      socket.emit('playerChange', window.id, 'coords', this.coords)
+    }
   }
 }
 
 
 
-function main (ctx, grid, player, opponents) {
-  player.execute(grid)
-
-  for (let id in opponents) {
-    opponents[id].execute(grid) 
+class Opponent {
+  constructor (coords, sprite) {
+    this.sprite = sprite
+    this.coords = coords
   }
+
+  processChange (changeType, value) {
+    switch (changeType) {
+      case 'coords': {
+        this.coords = value
+        break
+      }
+    }
+  }
+
+  draw (ctx, coordsFunc) {
+    let [x, y] = coordsFunc(this.coords)
+    ctx.drawImage(this.sprite, x, y)
+  }
+}
+
+
+
+function main (ctx, grid, player, opponents, socket) {
+  player.execute(grid, socket)
   
   ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
 
   drawOutline(ctx, player.generateDisplayCoords)
   drawGrid(ctx, grid, player.generateDisplayCoords)
-  player.draw(ctx)
   for (let id in opponents) {
     opponents[id].draw(ctx, player.generateDisplayCoords)
   }
+  player.draw(ctx)
 }
 
 function drawOutline (ctx, coordsFunc) {
@@ -219,39 +246,47 @@ const GRID_WIDTH = window.GRID_WIDTH,
       GRID_COLOR = '#8e8e8e'
 
 
-let grid, opponents, player, ctx, update
+let ctx, socket
 
-document.addEventListener('finishSocketInit', (event) => {
-  p('FINISH SOCKET EVENT')
-  if (update !== undefined) {
+document.addEventListener('finishCanvasInit', (event) => {
+  p('FINISH CTX EVENT')
+  if (socket) {
     p('START')
-    window.requestAnimationFrame(update)
+    init(ctx, socket)
   } else {
-    document.addEventListener('finishCanvasInit', (event) => {
+    document.addEventListener('finishSocketInit', (event) => {
       p('DELAYED START')
-      window.requestAnimationFrame(update)
+      init(ctx, socket)
     })
   }
 })
 
 
 
-export function initSocket (socket) {
-  p('INITSOCKET')
-  initPlayer((playerSprite) => {
-    initInput(socket)
+function init (ctx, socket) {
+  let grid = JSON.parse(window.grid)
+  let opponents = []
 
+  const spriteSheetImage = new Image()
+  spriteSheetImage.src = 'media/spritesheet.png'
+  
+  spriteSheetImage.onload = () => {
+    const spriteSheet = new SpriteSheet(spriteSheetImage, SCALE_FACTOR)
+    const playerSprite = spriteSheet.getSprite(12, 6, true)      
+
+    let player = new Player(convertFromGrid(JSON.parse(window.coords)), playerSprite)
+    
     socket.emit('new', window.id, player.coords)
 
     socket.on('player', (id, coords) => {
-      opponents[id] = new Player(coords, playerSprite)
+      opponents[id] = new Opponent(coords, playerSprite)
       // console.log('OPPONENTS', opponents)
       // console.log('RECEIVED PLAYER:', id) 
     })
 
 
     socket.on('new', (id, coords) => {
-      opponents[id] = new Player(coords, playerSprite)
+      opponents[id] = new Opponent(coords, playerSprite)
       // console.log('OPPONENTS', opponents)
       // console.log('NEW PLAYER:', id)
       socket.emit('player', window.id, player.coords)
@@ -264,87 +299,76 @@ export function initSocket (socket) {
     })
 
 
-    socket.on('action', (id, action) => {
+    socket.on('playerChange', (id, type, value) => {
       // console.log('OPPONENTS', opponents)
       // console.log('ACTION:', id)
-      opponents[id].setAction(action)
+      // console.log('CHANGE', type, value)
+      opponents[id].processChange(type, value)
     })
 
+    initInput(player)
 
-    const event = new Event('finishSocketInit')
-    document.dispatchEvent(event)
-  })
-}
-
-function initPlayer(callback) {
-  p('INITPLAYER')
-  grid = JSON.parse(window.grid)
-  opponents = []
-
-  const spriteSheetImage = new Image()
-  spriteSheetImage.src = 'media/spritesheet.png'
-  
-  spriteSheetImage.onload = () => {
-    const spriteSheet = new SpriteSheet(spriteSheetImage, SCALE_FACTOR)
-    const playerSprite = spriteSheet.getSprite(12, 6, true)      
-
-    player = new Player(convertFromGrid(JSON.parse(window.coords)), playerSprite)
-
-    callback(playerSprite)
+    let updateTime = 0
+    const update = (timestamp) => {
+      if (timestamp - updateTime > UPDATE_WAIT) {
+        main(ctx, grid, player, opponents, socket)
+        updateTime = timestamp
+        window.requestAnimationFrame(update)
+      } else {
+        window.requestAnimationFrame(update)
+      }
+    }
+    window.requestAnimationFrame(update)
   }
 }
 
-function initInput (socket) {
+function initInput (player) {
   p('INITINPUT')
   document.addEventListener('keydown', (event) => {
     let action
     switch (event.keyCode) {
       case KEY_LEFT:
-        action = 'MOVE-LEFT'
+        player.move('LEFT')
         break
       case KEY_RIGHT:
-        action = 'MOVE-RIGHT'
+        player.move('RIGHT')
         break
       case KEY_UP:
-        action = 'MOVE-UP'
+        player.move('UP')
         break
       case KEY_DOWN:
-        action = 'MOVE-DOWN'
+        player.move('DOWN')
         break
 
       default:
         return
     }
-    socket.emit('action', window.id, action)
-    player.setAction(action)
   })
 
   document.addEventListener('keyup', (event) => {
     let action
     switch (event.keyCode) {
       case KEY_LEFT:
-        action = 'UNMOVE-LEFT'
+        player.unmove('LEFT')
         break
       case KEY_RIGHT:
-        action = 'UNMOVE-RIGHT'
+        player.unmove('RIGHT')
         break
       case KEY_UP:
-        action = 'UNMOVE-UP'
+        player.unmove('UP')
         break
       case KEY_DOWN:
-        action = 'UNMOVE-DOWN'
+        player.unmove('DOWN')
         break
 
       default:
         return
     }
-    socket.emit('action', window.id, action)
-    player.setAction(action)
   })
 }
 
 
-export function initCanvas (canvas) {
+export function setCanvas (canvas) {
   p('INITCANVAS')
   canvas.width = CANVAS_WIDTH
   canvas.height = CANVAS_HEIGHT
@@ -352,22 +376,13 @@ export function initCanvas (canvas) {
   ctx.imageSmoothingEnabled = false
   ctx.scale(SCALE_FACTOR, SCALE_FACTOR)
 
-  initLoop()
-}
-  
-function initLoop () {
-  p('INITLOOP')
-  let updateTime = 0
-  update = (timestamp) => {
-    if (timestamp - updateTime > UPDATE_WAIT) {
-      main(ctx, grid, player, opponents)
-      updateTime = timestamp
-      window.requestAnimationFrame(update)
-    } else {
-      window.requestAnimationFrame(update)
-    }
-  }
-
   const event = new Event('finishCanvasInit')
+  document.dispatchEvent(event)
+}
+
+export function setSocket (socket_) {
+  p('INITSOCKET')
+  socket = socket_
+  const event = new Event('finishSocketInit')
   document.dispatchEvent(event)
 }

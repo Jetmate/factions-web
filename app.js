@@ -63,7 +63,7 @@ const GRID_HEIGHT = 20
 let grid = createGrid()
 
 const app = express()
-const server = app.listen(3000)
+const server = app.listen(3000, '0.0.0.0')
 const io = socketio(server)
 
 app.set('view engine', 'html')
@@ -114,8 +114,8 @@ p('RUNNING ON http://127.0.0.1:3000/')
 
 
 io.on('connection', (socket) => {
-  socket.on('action', (id, action) => {
-    socket.broadcast.emit('action', id, action)
+  socket.on('playerChange', (id, type, action) => {
+    socket.broadcast.emit('playerChange', id, type, action)
   })
 
   socket.on('new', (id, coords) => {

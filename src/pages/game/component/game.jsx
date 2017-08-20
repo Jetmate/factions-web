@@ -1,17 +1,17 @@
 import React from 'react'
 
-import { initSocket, initCanvas } from './game.js'
+import { setSocket, setCanvas } from './game.js'
 
 class Component extends React.Component {
   constructor (props) {
     super(props)
 
-    initSocket(this.props.socket)
+    setSocket(this.props.socket)
   }
 
   render () {
     return (
-      <canvas ref={initCanvas}>Looks like your browser does not support the JS canvas. yikes.</canvas>
+      <canvas ref={setCanvas}>Looks like your browser does not support the JS canvas. yikes.</canvas>
     )
   }
 }

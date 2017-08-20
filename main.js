@@ -92,7 +92,7 @@ var GRID_HEIGHT = 20;
 var grid = createGrid();
 
 var app = (0, _express2.default)();
-var server = app.listen(3000);
+var server = app.listen(3000, '0.0.0.0');
 var io = (0, _socket2.default)(server);
 
 app.set('view engine', 'html');
@@ -140,8 +140,8 @@ app.use(_express2.default.static('www'));
 p('RUNNING ON http://127.0.0.1:3000/');
 
 io.on('connection', function (socket) {
-  socket.on('action', function (id, action) {
-    socket.broadcast.emit('action', id, action);
+  socket.on('playerChange', function (id, type, action) {
+    socket.broadcast.emit('playerChange', id, type, action);
   });
 
   socket.on('new', function (id, coords) {
