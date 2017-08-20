@@ -4,9 +4,10 @@ import SpriteSheet from './SpriteSheet.js'
 
 const GRID_WIDTH = window.GRID_WIDTH
 const GRID_HEIGHT = window.GRID_HEIGHT
-const BLOCK_WIDTH = 10
-const WIDTH = BLOCK_WIDTH * 10
-const HEIGHT = BLOCK_WIDTH * 10
+const SCALE_FACTOR = 10
+const BLOCK_WIDTH = 16 * SCALE_FACTOR 
+const WIDTH = 100
+const HEIGHT = 100
 
 
 function opposite (number) {
@@ -90,15 +91,17 @@ class Component extends React.Component {
   }
 
   init = (canvas) => {
-    canvas.width = WIDTH
-    canvas.height = HEIGHT
+    canvas.width = WIDTH * SCALE_FACTOR
+    canvas.height = HEIGHT * SCALE_FACTOR
     const ctx = canvas.getContext('2d')
+    ctx.imageSmoothingEnabled = false
+    ctx.scale(SCALE_FACTOR, SCALE_FACTOR)
 
     const spriteSheetImage = new Image()
     spriteSheetImage.src = 'media/spritesheet.png'
     
     spriteSheetImage.onload = () => {
-      const spriteSheet = new SpriteSheet(spriteSheetImage)
+      const spriteSheet = new SpriteSheet(spriteSheetImage, SCALE_FACTOR)
       const playerSprite = spriteSheet.getSprite(12, 6, true)      
       let updateTime = 0
       let grid = JSON.parse(window.grid)
@@ -126,6 +129,7 @@ class Component extends React.Component {
     // opponent.execute(grid)
     
     ctx.clearRect(0, 0, WIDTH, HEIGHT)
+
     player.draw(ctx)
     // opponent.draw(player.generateDisplayCoords)
     // this.drawOutline()
@@ -288,7 +292,12 @@ class Player {
       ctx.drawImage(this.sprite, x, y)
       return
     }
+    console.log('size', this.size, 'coords', this.fakeCoords, HEIGHT, WIDTH)
     ctx.drawImage(this.sprite, this.fakeCoords[0], this.fakeCoords[1])
+    // ctx.fillStyle="#FF0000"
+    // ctx.fillRect(this.fakeCoords[0], this.fakeCoords[1], this.size[0], this.size[1])
+    // ctx.fillRect(10, 10, 10, 10)
+
   }
 }
 

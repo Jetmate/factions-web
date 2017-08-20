@@ -5,7 +5,7 @@ class SpriteSheet {
     canvas.height = spriteImage.height
     this.width = spriteImage.width
     this.height = spriteImage.height
-    this.sheet = canvas.getContext('2d')            
+    this.sheet = canvas.getContext('2d')
     this.sheet.drawImage(spriteImage, 0, 0)
     this.farthestY = 0
   }
