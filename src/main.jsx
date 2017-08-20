@@ -3,14 +3,14 @@ import ReactDOM from 'react-dom'
 
 import './normalize.css'
 import './index.css'
-import Loading from './pages/loading/index.jsx'
+import Setup from './pages/setup/index.jsx'
 import Game from './pages/game/index.jsx'
 import ExtraTab from './pages/extraTab/index.jsx'
 
 let Component
 switch (window.component) {
-  case 'loading':
-    Component = Loading
+  case 'setup':
+    Component = Setup
     break
   case 'game':
     Component = Game

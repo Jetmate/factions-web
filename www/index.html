@@ -2,16 +2,22 @@
 <html>
 <head>
     <meta charset="utf-8">
+    <title>Factions.io</title>
 </head>
 <body>
     <div id="app"></div>
     <script>
       window.component = "{{ component }}"
 
-      window.id = "{{ id }}"
-      window.opponent = "{{ opponent }}"
-      window.playerIndex = "{{ playerIndex }}"
+      {{#if id}}
+        window.id = "{{ id }}"
+        window.coords = "{{ coords }}"
+        window.grid = '{{{ grid }}}'
+        window.GRID_WIDTH = "{{ GRID_WIDTH }}"
+        window.GRID_HEIGHT = "{{ GRID_HEIGHT }}"
+      {{/if}}
     </script>
+    <script type="text/javascript" src="print.js"></script>
     <script type="text/javascript" src="bundle.js"></script>
 </body>
 </html>

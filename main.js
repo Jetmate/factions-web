@@ -26,9 +26,13 @@ var _expressSession = require('express-session');
 
 var _expressSession2 = _interopRequireDefault(_expressSession);
 
+var _bodyParser = require('body-parser');
+
+var _bodyParser2 = _interopRequireDefault(_bodyParser);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var p = function p() {
+function p() {
   for (var _len = arguments.length, items = Array(_len), _key = 0; _key < _len; _key++) {
     items[_key] = arguments[_key];
   }
@@ -46,119 +50,85 @@ var p = function p() {
       console.log(item);
     }
   });
-};
+}
 
-var randRange = function randRange(upper) {
+function randRange(upper) {
   return Math.floor(Math.random() * upper);
-};
+}
 
-var randomItem = function randomItem(array) {
-  return array[randRange(array.length)];
-};
+function randomCoords() {
+  return [randRange(GRID_WIDTH), randRange(GRID_HEIGHT)];
+}
 
-var CHAR_POOL = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-var randomString = function randomString() {
-  var length = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 16;
-
-  var result = [];
-  for (var i = 0; i < length; i++) {
-    result.push(randomItem(CHAR_POOL));
+function createGrid() {
+  var grid = [];
+  for (var x = 0; x < GRID_WIDTH; x++) {
+    grid[x] = [];
+    for (var y = 0; y < GRID_HEIGHT; y++) {
+      grid[x][y] = '';
+    }
   }
-  return result.join('');
-};
+  return grid;
+}
+
+// const randomItem = (array) => {
+//   return array[randRange(array.length)]
+// }
+
+// const CHAR_POOL = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+// const randomString = (length=16) => {
+//   let result = []
+//   for (let i = 0; i < length; i++) {
+//     result.push(randomItem(CHAR_POOL))
+//   }
+//   return result.join('')
+// }
+
+
+var GRID_WIDTH = 20;
+var GRID_HEIGHT = 20;
+var grid = createGrid();
 
 var app = (0, _express2.default)();
 var server = app.listen(3000);
 var io = (0, _socket2.default)(server);
-var loading = io.of('/loading');
 
 app.set('view engine', 'html');
 app.engine('html', _hbs2.default.__express);
 app.set('views', __dirname + '/www');
 
-var queue = [];
-var pairs = {};
-
 app.use((0, _helmet2.default)());
 // app.use(compression())
 app.use((0, _expressSession2.default)({ secret: 'KV8t4Bhvq4FAIwj7' }));
+app.use(_bodyParser2.default.json());
+app.use(_bodyParser2.default.urlencoded({ extended: true }));
 
 app.get('/', function (req, res, next) {
-  p('LOADING');
-  p('QUEUE', queue, 'PAIRS', pairs);
-
-  if (!('id' in req.session)) {
-    req.session.id = randomString();
-    p('NEW ID: ' + req.session.id);
-  }
-  if (~queue.indexOf(req.session.id)) {
-    res.render('index.html', { component: 'extraTab' });
-  } else {
-    req.session.opponent = '';
-    if (queue.length) {
-      req.session.opponent = queue.pop(0);
-      loading.emit('found', req.session.opponent);
-      p('HERE ' + req.session.opponent + ', ID: ' + req.session.id);
-      pairs[req.session.opponent] = req.session.id;
-      res.redirect('/game');
-    } else {
-      p('NO ONE: ID: ' + req.session.id);
-      queue.push(req.session.id);
-      res.render('index.html', { component: 'loading', id: req.session.id });
-    }
-  }
+  // if ('id' in req.session) {
+  //   res.render('index.html', {component: 'extraTab'})
+  // } else {
+  res.render('index.html', { component: 'setup' });
+  // }
 });
 
 app.get('/game', function (req, res, next) {
-  p('GAME');
-  p('QUEUE', queue, 'PAIRS', pairs);
-  if (!req.session.opponent && !(req.session.id in pairs)) {
-    res.redirect('/');
-  } else {
-    var opponent = void 0,
-        playerIndex = void 0;
-    if (!req.session.opponent) {
-      opponent = pairs[req.session.id];
-      delete pairs[req.session.id];
-      playerIndex = 1;
-      p('NO OPPONENT: ID: ' + req.session.id + ', OPPONENT: ' + opponent);
-    } else {
-      opponent = req.session.opponent;
-      delete req.session.opponent;
-      playerIndex = 0;
-    }
-    res.render('index.html', { component: 'game', playerIndex: playerIndex, id: req.session.id, opponent: opponent });
-  }
+  req.session.name = 'man'; //req.body.id
+  res.render('index.html', {
+    component: 'game',
+    id: 'man',
+    coords: JSON.stringify(randomCoords()),
+    grid: JSON.stringify(grid),
+    GRID_WIDTH: GRID_WIDTH,
+    GRID_HEIGHT: GRID_HEIGHT
+  });
 });
 
 app.use(_express2.default.static('www'));
 
 p('RUNNING ON http://127.0.0.1:3000/');
 
-loading.on('connection', function (socket) {
-  socket.on('close', function (id) {
-    // p('FIRST QUEUE', queue)
-    if (~queue.indexOf(id)) {
-      queue.splice(queue.indexOf(id), 1);
-    }
-    // p('NOW', queue)
-  });
-});
-
-var getRoom = function getRoom(socket) {
-  return Object.keys(socket.rooms)[1];
-};
-
 io.on('connection', function (socket) {
-  socket.on('ready', function (roomId) {
-    socket.join(roomId);
-  });
-
   socket.on('action', function (data) {
-    socket.broadcast.to(getRoom(socket)).emit('action', data);
-  });
-
-  socket.on('close', function (id) {
-    socket.broadcast.to(getRoom(socket)).emit('close', id);
+    socket.broadcast.emit('action', data);
   });
 });

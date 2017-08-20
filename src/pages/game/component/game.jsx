@@ -1,27 +1,87 @@
 import React from 'react'
 
-const opposite = (number) => {
+import SpriteSheet from './SpriteSheet.js'
+
+const GRID_WIDTH = window.GRID_WIDTH
+const GRID_HEIGHT = window.GRID_HEIGHT
+const BLOCK_WIDTH = 10
+const WIDTH = BLOCK_WIDTH * 10
+const HEIGHT = BLOCK_WIDTH * 10
+
+
+function opposite (number) {
   return Math.abs(number - 1)
 }
 
+function convertToGrid (x, y) {
+  return [(x / BLOCK_WIDTH) >> 0, (y / BLOCK_WIDTH) >> 0]
+} 
+
+function findAllGridCoords (coords, size) {
+  let allCoords = []
+
+  let firstCoords = convertToGrid(coords[0], coords[1])
+  allCoords.push(firstCoords)
+
+  let xCoords = convertToGrid(coords[0] + size[0], coords[1])
+  if (xCoords[0] !== firstCoords[0]) {
+    allCoords.push(xCoords)
+  }
+
+  let yCoords = convertToGrid(coords[0], coords[1] + size[1])
+  if (yCoords[1] !== firstCoords[1]) {
+    allCoords.push(yCoords)
+  }
+
+  if (xCoords[0] !== firstCoords[0] && yCoords[1] !== firstCoords[1]) {
+    allCoords.push(convertToGrid(coords[0] + size[0], coords[1] + size[1]))
+  }
+
+  return allCoords
+}
+
+function convertFromGrid (x, y) {
+  return [x * BLOCK_WIDTH, y * BLOCK_WIDTH]
+}
+
+function findCenter (size1, size2, coords) {
+  if (coords) {
+    return [
+      (size1[0] / 2 - size2[0] / 2) + coords[0],
+      (size1[1] / 2 - size2[1] / 2) + coords[1]
+    ]  
+  }
+  return [
+    size1[0] / 2 - size2[0] / 2,
+    size1[1] / 2 - size2[1] / 2
+  ]
+}
+
+function withinBounds (coords, grid) {
+  for (let i = 0; i < coords.length; i++) {
+    if (grid[coords[i][0]] === undefined || grid[coords[i][0]][coords[i][1]] === undefined) {
+      return false
+    }
+  }
+  return true
+}
+
+
 class Component extends React.Component {
-  GRID_WIDTH = 20
-  GRID_HEIGHT = 20
-  BLOCK_WIDTH = 20
+  // UPDATE_WAIT = 33
+  UPDATE_WAIT = 1000
 
-  WIDTH = this.GRID_WIDTH * this.BLOCK_WIDTH
-  HEIGHT = this.GRID_HEIGHT * this.BLOCK_WIDTH
+  // ARROW KEYS
+  // KEY_RIGHT = 39
+  // KEY_LEFT = 37
+  // KEY_UP = 38
+  // KEY_DOWN = 40
 
-  UPDATE_WAIT = 100
-
-  GRID_COLOR = '#bdc3c7'
-  COLORS = {PLAYER: '#c0392b', OPPONENT: '#16a085'}
-  PLAYER_STARTING_COORDS = [[0, 0], [this.GRID_WIDTH - 1, this.GRID_HEIGHT - 1]]
-
-  KEY_RIGHT = 39
-  KEY_LEFT = 37
-  KEY_UP = 38
-  KEY_DOWN = 40
+  // WASD
+  KEY_RIGHT = 68
+  KEY_LEFT = 65
+  KEY_UP = 87
+  KEY_DOWN = 83
 
   render () {
     return (
@@ -29,56 +89,47 @@ class Component extends React.Component {
     )
   }
 
-  createGrid = () => {
-    let grid = []
-    for (let x = 0; x < this.GRID_WIDTH; x++) {
-      grid[x] = []
-      for (let y = 0; y < this.GRID_WIDTH; y++) {
-        grid[x][y] = ''
-      }
-    }
-    return grid
-  }
-
   init = (canvas) => {
-    canvas.width = this.WIDTH
-    canvas.height = this.HEIGHT
+    canvas.width = WIDTH
+    canvas.height = HEIGHT
     const ctx = canvas.getContext('2d')
 
-    let updateTime = 0
-    let player = new Player('PLAYER', this.PLAYER_STARTING_COORDS[window.playerIndex])
-    let opponent = new Player('OPPONENT', this.PLAYER_STARTING_COORDS[opposite(window.playerIndex)])
-    let grid = this.createGrid()
-    player.move(grid)
-    opponent.move(grid)
-    this.draw(ctx, grid)
+    const spriteSheetImage = new Image()
+    spriteSheetImage.src = 'media/spritesheet.png'
+    
+    spriteSheetImage.onload = () => {
+      const spriteSheet = new SpriteSheet(spriteSheetImage)
+      const playerSprite = spriteSheet.getSprite(12, 6, true)      
+      let updateTime = 0
+      let grid = JSON.parse(window.grid)
+      let player = new Player(JSON.parse(window.coords), playerSprite, [playerSprite.width, playerSprite.height])
+      let opponents = []
 
-    this.initInput(ctx, grid, player)
-    this.initOpponent(ctx, grid, opponent)
+      this.initInput(ctx, grid, player)
 
-    this.update = (timestamp) => {
-      if (timestamp - updateTime > this.UPDATE_WAIT) {
-        console.log('BEFORE MAIN`')
-        this.main(ctx, player, opponent, grid)
-        updateTime = timestamp
-        window.requestAnimationFrame(this.update)
-      } else {
-        window.requestAnimationFrame(this.update)
+      this.update = (timestamp) => {
+        if (timestamp - updateTime > this.UPDATE_WAIT) {
+          this.main(ctx, grid, player, opponents)
+          updateTime = timestamp
+          window.requestAnimationFrame(this.update)
+        } else {
+          window.requestAnimationFrame(this.update)
+        }
       }
+      window.requestAnimationFrame(this.update)
     }
-    window.requestAnimationFrame(this.update)
   }
 
-  main = (ctx, player, opponent, grid) => {
-    player.execute(grid, this.GRID_WIDTH, this.GRID_HEIGHT)
-    opponent.execute(grid, this.GRID_WIDTH, this.GRID_HEIGHT)
-    this.draw(ctx, grid)
-  }
-
-  draw = (ctx, grid) => {
-    ctx.clearRect(0, 0, this.WIDTH, this.HEIGHT)
-    this.drawOutline(ctx)
-    this.drawContents(ctx, grid)
+  main = (ctx, grid, player, opponents) => {
+    player.execute(grid)
+    p(player.coords)
+    // opponent.execute(grid)
+    
+    ctx.clearRect(0, 0, WIDTH, HEIGHT)
+    player.draw(ctx)
+    // opponent.draw(player.generateDisplayCoords)
+    // this.drawOutline()
+    this.drawGrid(ctx, grid, player.generateDisplayCoords)
   }
 
   initInput = (ctx, grid, player) => {
@@ -96,19 +147,6 @@ class Component extends React.Component {
           break
         case this.KEY_DOWN:
           action = 'MOVE-DOWN'
-          break
-
-        case this.KEY_SHOOT_LEFT:
-          action = 'SHOOT-LEFT'
-          break
-        case this.KEY_SHOOT_RIGHT:
-          action = 'SHOOT-RIGHT'
-          break
-        case this.KEY_SHOOT_UP:
-          action = 'SHOOT-UP'
-          break
-        case this.KEY_SHOOT_DOWN:
-          action = 'SHOOT-DOWN'
           break
 
         default:
@@ -134,19 +172,6 @@ class Component extends React.Component {
           action = 'UNMOVE-DOWN'
           break
 
-        case this.KEY_SHOOT_LEFT:
-          action = 'UNSHOOT-LEFT'
-          break
-        case this.KEY_SHOOT_RIGHT:
-          action = 'UNSHOOT-RIGHT'
-          break
-        case this.KEY_SHOOT_UP:
-          action = 'UNSHOOT-UP'
-          break
-        case this.KEY_SHOOT_DOWN:
-          action = 'UNSHOOT-DOWN'
-          break
-
         default:
           return
       }
@@ -161,28 +186,25 @@ class Component extends React.Component {
     })
   }
 
-  drawOutline = (ctx) => {
-    ctx.strokeStyle = this.GRID_COLOR
-    for (let x = 0; x <= this.GRID_WIDTH; x++) {
-      ctx.beginPath()
-      ctx.moveTo(x * this.BLOCK_WIDTH, 0)
-      ctx.lineTo(x * this.BLOCK_WIDTH, this.HEIGHT)
-      ctx.stroke()
-    }
-    for (let y = 0; y <= this.GRID_HEIGHT; y++) {
-      ctx.beginPath()
-      ctx.moveTo(0, y * this.BLOCK_WIDTH)
-      ctx.lineTo(this.WIDTH, y * this.BLOCK_WIDTH)
-      ctx.stroke()
-    }
-  }
+  // drawOutline = (ctx, coordsFunc) => {
+  //   ctx.beginPath()
+  //   ctx.strokeStyle = this.GRID_COLOR
+  //   for (let x = 0; x <= GRID_WIDTH; x++) {
+  //     ctx.moveTo(x * this.BLOCK_WIDTH, 0)
+  //     ctx.lineTo(x * this.BLOCK_WIDTH, HEIGHT)
+  //   }
+  //   for (let y = 0; y <= GRID_HEIGHT; y++) {
+  //     ctx.moveTo(0, y * this.BLOCK_WIDTH)
+  //     ctx.lineTo(WIDTH, y * this.BLOCK_WIDTH)
+  //   }
+  //   ctx.stroke()
+  // }
 
-  drawContents = (ctx, grid) => {
-    for (let x = 0; x < this.GRID_WIDTH; x++) {
-      for (let y = 0; y < this.GRID_WIDTH; y++) {
+  drawGrid = (ctx, grid, coordsFunc) => {
+    for (let x = 0; x < GRID_WIDTH; x++) {
+      for (let y = 0; y < GRID_HEIGHT; y++) {
         if (grid[x][y]) {
-          ctx.fillStyle = this.COLORS[grid[x][y]]
-          ctx.fillRect(x * this.BLOCK_WIDTH, y * this.BLOCK_WIDTH, this.BLOCK_WIDTH, this.BLOCK_WIDTH)
+          ctx.drawImage(this.sprites[grid[x][y]], coordsFunc(convertFromGrid(x, y)))
         }
       }
     }
@@ -191,9 +213,13 @@ class Component extends React.Component {
 
 
 class Player {
-  constructor (type, coords) {
-    this.type = type
-    this.coords = coords
+  SPEED = 5 
+
+  constructor (gridCoords, sprite, size) {
+    this.sprite = sprite
+    this.size = size
+    this.coords = findCenter([BLOCK_WIDTH, BLOCK_WIDTH], size, gridCoords)
+    this.fakeCoords = findCenter([WIDTH, HEIGHT], this.size)
     this.velocity = [0, 0]
   }
 
@@ -203,19 +229,19 @@ class Player {
       case 'MOVE': {
         switch (action) {
           case 'MOVE-RIGHT': {
-            this.velocity[0] = 1
+            this.velocity[0] = this.SPEED
             break
           }
           case 'MOVE-LEFT': {
-            this.velocity[0] = -1
+            this.velocity[0] = -this.SPEED
             break
           }
           case 'MOVE-UP': {
-            this.velocity[1] = -1
+            this.velocity[1] = -this.SPEED
             break
           }
           case 'MOVE-DOWN': {
-            this.velocity[1] = 1
+            this.velocity[1] = this.SPEED
             break
           }
         }
@@ -236,74 +262,33 @@ class Player {
         }
         break
       }
-      case 'SHOOT': {
-        switch (action) {
-          case 'SHOOT-RIGHT': {
-            this.shooting[0] = true
-            break
-          }
-          case 'SHOOT-LEFT': {
-            this.velocity[1] = true
-            break
-          }
-          case 'SHOOT-UP': {
-            this.velocity[2] = true
-            break
-          }
-          case 'SHOOT-DOWN': {
-            this.velocity[3] = true
-            break
-          }
-        }
-        break
-      }
-      case 'UNSHOOT': {
-        switch (action) {
-          case 'UNSHOOT-LEFT': {
-            this.shooting[0] = false
-            break
-          }
-          case 'UNSHOOT-RIGHT': {
-            this.shooting[1] = false
-            break
-          }
-          case 'UNSHOOT-UP': {
-            this.shooting[2] = false
-            break
-          }
-          case 'UNSHOOT-DOWN': {
-            this.shooting[3] = false
-            break
-          }
-        }
-        break
-      }
     }
   }
 
   execute (grid) {
     if (this.velocity[0] || this.velocity[1]) {
-      if (grid[this.coords[0] + this.velocity[0]] !== undefined) {
-        let destination = grid[this.coords[0] + this.velocity[0]][this.coords[1] + this.velocity[1]]
-        console.log(destination)
-        if (destination !== undefined && destination !== 'OPPONENT') {
-          this.move(grid)
-        }
+      let newCoords = [this.coords[0] + this.velocity[0], this.coords[1] + this.velocity[1]]
+      let gridCoords = findAllGridCoords(newCoords, this.size)
+      if (withinBounds(gridCoords, grid)) {
+        this.coords = newCoords
       }
     }
   }
 
-  withinBounds (width, height) {
-    console.log(this.coords, this.velocity, width, height)
-    return (this.coords[0] + this.velocity[0] >= 0 && this.coords[0] + this.velocity[0] < width) &&
-           (this.coords[1] + this.velocity[1] >= 0 && this.coords[1] + this.velocity[1] < height)
+  generateDisplayCoords (coords) {
+    return [
+      coords[0] + this.fakeCoords[0] - this.coords[0],
+      coords[1] + this.fakeCoords[1] - this.coords[1]
+    ]
   }
 
-  move(grid) {
-    grid[this.coords[0]][this.coords[1]] = ''
-    this.coords[0] += this.velocity[0]
-    this.coords[1] += this.velocity[1]
-    grid[this.coords[0]][this.coords[1]] = this.type
+  draw (ctx, coordsFunc) {
+    if (coordsFunc) {
+      let [x, y] = coordsFunc(this.coords)
+      ctx.drawImage(this.sprite, x, y)
+      return
+    }
+    ctx.drawImage(this.sprite, this.fakeCoords[0], this.fakeCoords[1])
   }
 }
 
