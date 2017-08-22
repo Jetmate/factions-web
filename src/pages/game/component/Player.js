@@ -1,18 +1,23 @@
-import { findCenter, withinBounds } from './helpers.js'
+import { findCenter, withinBounds, generateId } from './helpers.js'
 import { BLOCK_WIDTH, CANVAS_WIDTH, CANVAS_HEIGHT } from './constants.js'
+import Bullet from './Bullet.js'
+import SpriteManager from './SpriteManager.js'
 
 export default class Player {
   SPEED = 5
 
-  constructor (coords, spriteManager, socket) {
+  constructor (coords, spriteManager, socket, bulletSprite) {
     this.spriteManager = spriteManager
     this.size = [spriteManager.canvas.width, spriteManager.canvas.height]
     this.coords = findCenter([BLOCK_WIDTH, BLOCK_WIDTH], this.size, coords)
     this.fakeCoords = findCenter([CANVAS_WIDTH, CANVAS_HEIGHT], this.size)
     this.fakeCenterCoords = [CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2] 
     this.velocity = [0, 0]
+    this.rotation = 0
     this.directions = {'RIGHT': false, 'LEFT': false, 'UP': false, 'DOWN': false}
     this.socket = socket
+    this.bulletSprite = bulletSprite
+    this.bullets = []
   }
 
   move (direction) {
@@ -65,15 +70,15 @@ export default class Player {
     }
   }
 
-  rotate(cursorX, cursorY) {
+  rotate (cursorX, cursorY) {
     let cursorDiff = [cursorX - this.fakeCenterCoords[0], cursorY - this.fakeCenterCoords[1]]
-    let rotation = Math.atan(cursorDiff[1] / cursorDiff[0]) + -1.5708
+    this.rotation = Math.atan(cursorDiff[1] / cursorDiff[0]) + -1.5708
 
     if (cursorDiff[0] < 0) {
-      rotation += 3.14159
+      this.rotation += 3.14159
     }
-    this.spriteManager.rotate(rotation)
-    this.socket.emit('playerChange', window.id, 'rotation', rotation)
+    this.spriteManager.rotate(this.rotation)
+    this.socket.emit('playerChange', window.id, 'rotation', this.rotation)
   }
 
   draw (ctx) {
@@ -87,20 +92,37 @@ export default class Player {
     ]
   }
 
-    execute (grid, socket) {
-      let oldCoords = this.coords.slice()
-      for (let i = 0; i < 2; i++) {
-        if (this.velocity[i]) {
-          let newCoords = this.coords.slice()
+  execute (grid, socket) {
+    let oldCoords = this.coords.slice()
+    for (let i = 0; i < 2; i++) {
+      if (this.velocity[i]) {
+        let newCoords = this.coords.slice()
         newCoords[i] += this.velocity[i]
         if (withinBounds(newCoords, this.size)) {
           this.coords[i] = newCoords[i]
         }
       }
     }
-
     if (this.coords[0] !== oldCoords[0] || this.coords[1] !== oldCoords[1]) {
       this.socket.emit('playerChange', window.id, 'coords', this.coords)
+    }
+  }
+
+  shoot (cursorX, cursorY) {
+    let bullet = new Bullet(generateId(), this.rotation, this.coords.slice(), new SpriteManager(this.bulletSprite))
+    this.socket.emit('newBullet', bullet.id, this.coords)
+    this.bullets.push(bullet)
+  }
+
+  moveBullets () {
+    for (let i = 0; i < this.bullets.length; i++) {
+      this.bullets[i].move()
+    }
+  }
+
+  drawBullets (ctx) {
+    for (let i = 0; i < this.bullets.length; i++) {
+      this.bullets[i].draw(ctx, this.generateDisplayCoords)
     }
   }
 }

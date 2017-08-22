@@ -54,3 +54,20 @@ export function withinBounds (coords, size) {
     coords[1] >= 0 && coords[1] + size[1] <= HEIGHT
   )
 }
+
+export function randRange (upper) {
+  return Math.floor(Math.random() * upper)
+}
+
+export function randomItem (array) {
+  return array[randRange(array.length)]
+}
+
+const CHAR_POOL = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+export function generateId (length=5) {
+  let result = []
+  for (let i = 0; i < length; i++) {
+    result.push(randomItem(CHAR_POOL))
+  }
+  return result.join('')
+}

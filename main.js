@@ -144,6 +144,10 @@ io.on('connection', function (socket) {
     socket.broadcast.emit('playerChange', id, type, action);
   });
 
+  socket.on('newBullet', function (bulletId, coords, rotation) {
+    socket.broadcast.emit('newBullet', bulletId, coords, rotation);
+  });
+
   socket.on('new', function (id, coords) {
     socket.broadcast.emit('new', id, coords);
   });
