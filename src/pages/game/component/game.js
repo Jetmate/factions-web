@@ -16,10 +16,11 @@ function main (ctx, grid, player, opponents, bullets) {
   }
 
   ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-
   drawOutline(ctx, player.generateDisplayCoords)
   drawGrid(ctx, grid, player.generateDisplayCoords)
   for (let id in bullets) {
+    console.log(id)
+    console.log(bullets[id])
     bullets[id].draw(ctx, player.generateDisplayCoords)
   }
   player.drawBullets(ctx)
@@ -96,7 +97,8 @@ function init (ctx, socket) {
     socket.emit('new', window.id, player.coords)
 
     socket.on('newBullet', (id, coords, rotation) => {
-      bullets[id] = new Bullet(id, coords, rotation, new SpriteManager(bulletSprite))
+      bullets[id] = new Bullet(id, rotation, coords, new SpriteManager(bulletSprite))
+      console.log(coords)
     })
 
     socket.on('player', (id, coords) => {
@@ -132,7 +134,7 @@ function init (ctx, socket) {
     let updateTime = 0
     const update = (timestamp) => {
       if (timestamp - updateTime > UPDATE_WAIT) {
-        main(ctx, grid, player, opponents)
+        main(ctx, grid, player, opponents, bullets)
         updateTime = timestamp
         window.requestAnimationFrame(update)
       } else {

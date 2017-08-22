@@ -109,8 +109,8 @@ export default class Player {
   }
 
   shoot (cursorX, cursorY) {
-    let bullet = new Bullet(generateId(), this.rotation, this.coords.slice(), new SpriteManager(this.bulletSprite))
-    this.socket.emit('newBullet', bullet.id, this.coords)
+    let bullet = new Bullet(generateId(), this.rotation, [this.coords[0] + this.size[0] / 2, this.coords[1] + this.size[1] / 2], new SpriteManager(this.bulletSprite))
+    this.socket.emit('newBullet', bullet.id, this.coords, this.rotation)
     this.bullets.push(bullet)
   }
 
