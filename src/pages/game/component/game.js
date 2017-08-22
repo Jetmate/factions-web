@@ -6,8 +6,8 @@ import Opponent from './Opponent.js'
 import { convertFromGrid } from './helpers.js'
 import { GRID_WIDTH, GRID_HEIGHT, SCALE_FACTOR, BLOCK_WIDTH, WIDTH, HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT, UPDATE_WAIT, KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN, GRID_COLOR } from './constants.js'
 
-function main (ctx, grid, player, opponents, socket) {
-  player.execute(grid, socket)
+function main (ctx, grid, player, opponents) {
+  player.execute(grid)
   
   ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
 
@@ -80,19 +80,19 @@ function init (ctx, socket) {
     const playerSprite = spriteSheet.getSprite(12, 6, true)
     const playerSpriteManager = new SpriteManager(playerSprite, SCALE_FACTOR)
 
-    let player = new Player(convertFromGrid(JSON.parse(window.coords)), playerSpriteManager)
+    let player = new Player(convertFromGrid(JSON.parse(window.coords)), playerSpriteManager, socket)
     
     socket.emit('new', window.id, player.coords)
 
     socket.on('player', (id, coords) => {
-      opponents[id] = new Opponent(coords, playerSpriteManager)
+      opponents[id] = new Opponent(coords, new SpriteManager(playerSprite, SCALE_FACTOR))
       // console.log('OPPONENTS', opponents)
       // console.log('RECEIVED PLAYER:', id) 
     })
 
 
     socket.on('new', (id, coords) => {
-      opponents[id] = new Opponent(coords, playerSpriteManager)
+      opponents[id] = new Opponent(coords, new SpriteManager(playerSprite, SCALE_FACTOR))
       // console.log('OPPONENTS', opponents)
       // console.log('NEW PLAYER:', id)
       socket.emit('player', window.id, player.coords)
@@ -117,7 +117,7 @@ function init (ctx, socket) {
     let updateTime = 0
     const update = (timestamp) => {
       if (timestamp - updateTime > UPDATE_WAIT) {
-        main(ctx, grid, player, opponents, socket)
+        main(ctx, grid, player, opponents)
         updateTime = timestamp
         window.requestAnimationFrame(update)
       } else {

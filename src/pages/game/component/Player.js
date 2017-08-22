@@ -4,15 +4,15 @@ import { BLOCK_WIDTH, CANVAS_WIDTH, CANVAS_HEIGHT } from './constants.js'
 export default class Player {
   SPEED = 5
 
-  constructor (coords, spriteManager) {
+  constructor (coords, spriteManager, socket) {
     this.spriteManager = spriteManager
     this.size = [spriteManager.canvas.width, spriteManager.canvas.height]
     this.coords = findCenter([BLOCK_WIDTH, BLOCK_WIDTH], this.size, coords)
     this.fakeCoords = findCenter([CANVAS_WIDTH, CANVAS_HEIGHT], this.size)
     this.fakeCenterCoords = [CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2] 
-    p(CANVAS_WIDTH, CANVAS_HEIGHT, this.fakeCoords)
     this.velocity = [0, 0]
     this.directions = {'RIGHT': false, 'LEFT': false, 'UP': false, 'DOWN': false}
+    this.socket = socket
   }
 
   move (direction) {
@@ -73,6 +73,7 @@ export default class Player {
       rotation += 3.14159
     }
     this.spriteManager.rotate(rotation)
+    this.socket.emit('playerChange', window.id, 'rotation', rotation)
   }
 
   draw (ctx) {
@@ -99,7 +100,7 @@ export default class Player {
     }
 
     if (this.coords[0] !== oldCoords[0] || this.coords[1] !== oldCoords[1]) {
-      socket.emit('playerChange', window.id, 'coords', this.coords)
+      this.socket.emit('playerChange', window.id, 'coords', this.coords)
     }
   }
 }

@@ -10,6 +10,10 @@ export default class Opponent {
         this.coords = value
         break
       }
+      case 'rotation': {
+        this.spriteManager.rotate(value)
+        break
+      }
     }
   }
 
