@@ -137,7 +137,7 @@ app.get('/game', function (req, res, next) {
 
 app.use(_express2.default.static('www'));
 
-p('RUNNING ON http://127.0.0.1:3000/');
+p('RUNNING ON http://0.0.0.0:3000/');
 
 io.on('connection', function (socket) {
   socket.on('playerChange', function (id, type, action) {

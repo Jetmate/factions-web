@@ -109,7 +109,7 @@ app.get('/game', (req, res, next) => {
 
 app.use(express.static('www'))
 
-p('RUNNING ON http://127.0.0.1:3000/')
+p('RUNNING ON http://0.0.0.0:3000/')
 
 
 
