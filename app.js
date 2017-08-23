@@ -97,9 +97,9 @@ app.get('/game', (req, res, next) => {
     res.redirect('/')
   } else {
     res.render('index.html', {
-      component: 'game', 
-      id: req.session.name, 
-      coords: JSON.stringify(randomCoords()), 
+      component: 'game',
+      id: req.session.name,
+      coords: JSON.stringify(randomCoords()),
       grid: JSON.stringify(grid),
       GRID_WIDTH: GRID_WIDTH,
       GRID_HEIGHT: GRID_HEIGHT

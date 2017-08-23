@@ -1,13 +1,13 @@
 export default class Bullet {
-  SPEED = 6
+  SPEED = 20
 
   constructor (id, rotation, coords, spriteManager) {
     this.id = id
     this.rotation = rotation
     this.direction = rotation + 1.5708
-    this.coords = coords
     this.spriteManager = spriteManager
     this.spriteManager.rotate(rotation)
+    this.coords = coords
   }
 
   move () {

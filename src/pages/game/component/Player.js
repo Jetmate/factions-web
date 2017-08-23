@@ -6,11 +6,10 @@ import SpriteManager from './SpriteManager.js'
 export default class Player {
   SPEED = 5
 
-  constructor (coords, spriteManager, socket, bulletSprite) {
+  constructor (coords, spriteManager, socket, bulletSprite, bulletStart) {
     this.spriteManager = spriteManager
-    this.size = [spriteManager.canvas.width, spriteManager.canvas.height]
-    this.coords = findCenter([BLOCK_WIDTH, BLOCK_WIDTH], this.size, coords)
-    this.fakeCoords = findCenter([CANVAS_WIDTH, CANVAS_HEIGHT], this.size)
+    this.coords = findCenter([BLOCK_WIDTH, BLOCK_WIDTH], this.spriteManager.size, coords)
+    this.fakeCoords = findCenter([CANVAS_WIDTH, CANVAS_HEIGHT], this.spriteManager.size)
     this.fakeCenterCoords = [CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2]
     this.velocity = [0, 0]
     this.rotation = 0
@@ -18,6 +17,8 @@ export default class Player {
     this.socket = socket
     this.bulletSprite = bulletSprite
     this.bullets = []
+    this.bulletStartDiff = Math.sqrt((bulletStart[0] - Math.abs(this.spriteManager.size[0] / 2)) ** 2 + (bulletStart[1] - Math.abs(this.spriteManager.size[1] / 2)) ** 2)
+    console.log(bulletStart, this.spriteManager.size)
   }
 
   move (direction) {
@@ -98,7 +99,7 @@ export default class Player {
       if (this.velocity[i]) {
         let newCoords = this.coords.slice()
         newCoords[i] += this.velocity[i]
-        if (withinBounds(newCoords, this.size)) {
+        if (withinBounds(newCoords, this.spriteManager.size)) {
           this.coords[i] = newCoords[i]
         }
       }
@@ -109,7 +110,15 @@ export default class Player {
   }
 
   shoot (cursorX, cursorY) {
-    let bullet = new Bullet(generateId(), this.rotation, [this.coords[0] + this.bulletCoords[0], this.coords[1] + this.bulletCoords[1]], new SpriteManager(this.bulletSprite))
+    let bullet = new Bullet(
+      generateId(),
+      this.rotation,
+      [
+        this.coords[0] + this.spriteManager.size[0] / 2 + Math.cos(this.rotation) * this.bulletStartDiff,
+        this.coords[1] + this.spriteManager.size[1] / 2 + Math.sin(this.rotation) * this.bulletStartDiff
+      ],
+      new SpriteManager(this.bulletSprite)
+    )
     this.socket.emit('newBullet', bullet.id, this.coords, this.rotation)
     this.bullets.push(bullet)
   }

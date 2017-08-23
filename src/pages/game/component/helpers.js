@@ -64,7 +64,7 @@ export function randomItem (array) {
 }
 
 const CHAR_POOL = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-export function generateId (length=5) {
+export function generateId (length = 5) {
   let result = []
   for (let i = 0; i < length; i++) {
     result.push(randomItem(CHAR_POOL))

@@ -4,6 +4,7 @@ import { SCALE_FACTOR } from './constants.js'
 export default class SpriteManager {
   constructor (sprite) {
     this.sprite = sprite
+    this.size = [this.sprite.width * SCALE_FACTOR, this.sprite.height * SCALE_FACTOR]
     this.canvas = document.createElement('canvas')
 
     this.diagonal = Math.sqrt(this.sprite.width ** 2 + this.sprite.height ** 2) >> 0

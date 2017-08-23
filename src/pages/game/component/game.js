@@ -5,7 +5,7 @@ import Opponent from './Opponent.js'
 import Bullet from './Bullet.js'
 
 import { convertFromGrid } from './helpers.js'
-import { GRID_WIDTH, GRID_HEIGHT, BLOCK_WIDTH, WIDTH, HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT, UPDATE_WAIT, KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN, GRID_COLOR } from './constants.js'
+import { SCALE_FACTOR, GRID_WIDTH, GRID_HEIGHT, BLOCK_WIDTH, WIDTH, HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT, UPDATE_WAIT, KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN, GRID_COLOR } from './constants.js'
 
 function main (ctx, grid, player, opponents, bullets) {
   player.execute(grid)
@@ -87,8 +87,8 @@ function init (ctx, socket) {
     const spriteSheet = new SpriteSheet(spriteSheetImage)
     const playerSprite = spriteSheet.getSprite(12, 8, true)
     const bulletSprite = spriteSheet.getSprite(3, 4, true)
-
-    let player = new Player(convertFromGrid(JSON.parse(window.coords)), new SpriteManager(playerSprite), socket, bulletSprite)
+    const bulletStart = [9 * SCALE_FACTOR, 5 * SCALE_FACTOR]
+    let player = new Player(convertFromGrid(JSON.parse(window.coords)), new SpriteManager(playerSprite), socket, bulletSprite, bulletStart)
 
     socket.emit('new', window.id, player.coords)
 
