@@ -1,4 +1,4 @@
-import { findCenter, withinBounds, generateId } from './helpers.js'
+import { findCenter, withinBounds, generateId, checkCollision } from './helpers.js'
 import { BLOCK_WIDTH, CANVAS_WIDTH, CANVAS_HEIGHT } from './constants.js'
 import Bullet from './Bullet.js'
 import SpriteManager from './SpriteManager.js'
@@ -18,7 +18,6 @@ export default class Player {
     this.bulletSprite = bulletSprite
     this.bullets = []
     this.bulletStartDiff = Math.sqrt((bulletStart[0] - Math.abs(this.spriteManager.size[0] / 2)) ** 2 + (bulletStart[1] - Math.abs(this.spriteManager.size[1] / 2)) ** 2)
-    console.log(bulletStart, this.spriteManager.size)
   }
 
   move (direction) {
@@ -119,17 +118,28 @@ export default class Player {
       ],
       new SpriteManager(this.bulletSprite)
     )
-    this.socket.emit('newBullet', bullet.id, this.coords, this.rotation)
+    this.socket.emit('newBullet', bullet.id, bullet.coords, this.rotation)
     this.bullets.push(bullet)
   }
 
-  moveBullets () {
+  moveBullets (players) {
     let crashedBullets = []
     for (let i = 0; i < this.bullets.length; i++) {
       this.bullets[i].move()
       if (!withinBounds(this.bullets[i].coords, this.bullets[i].spriteManager.size)) {
         this.socket.emit('bulletCrash', this.bullets[i].id)
         crashedBullets.push(i)
+      } else {
+        for (let id in players) {
+          console.log(checkCollision(players[id], this.bullets[i]))
+          if (checkCollision(players[id], this.bullets[i])) {
+            console.log(id)
+            this.socket.emit('bulletHit', this.bullets[i].id, id)
+            crashedBullets.push(i)
+            delete players[id]
+            break
+          }
+        }
       }
     }
     for (let i = 0; i < crashedBullets.length; i++) {

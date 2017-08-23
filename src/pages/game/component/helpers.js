@@ -71,3 +71,10 @@ export function generateId (length = 5) {
   }
   return result.join('')
 }
+
+export function checkCollision (thing1, thing2) {
+  return (thing1.coords[0] < thing2.coords[0] + thing2.spriteManager.size[0]) &&
+         (thing2.coords[0] < thing1.coords[0] + thing1.spriteManager.size[0]) &&
+         (thing1.coords[1] < thing2.coords[1] + thing2.spriteManager.size[1]) &&
+         (thing2.coords[1] < thing1.coords[1] + thing1.spriteManager.size[1])
+}

@@ -152,6 +152,10 @@ io.on('connection', function (socket) {
     socket.broadcast.emit('bulletCrash', bulletId);
   });
 
+  socket.on('bulletHit', function (bulletId, playerId) {
+    socket.broadcast.emit('bulletHit', bulletId, playerId);
+  });
+
   socket.on('new', function (id, coords) {
     socket.broadcast.emit('new', id, coords);
   });

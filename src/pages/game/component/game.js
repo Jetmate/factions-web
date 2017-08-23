@@ -9,7 +9,7 @@ import { SCALE_FACTOR, GRID_WIDTH, GRID_HEIGHT, BLOCK_WIDTH, WIDTH, HEIGHT, CANV
 
 function main (ctx, grid, player, opponents, bullets) {
   player.execute(grid)
-  player.moveBullets()
+  player.moveBullets(opponents)
 
   for (let id in bullets) {
     bullets[id].move()
@@ -98,6 +98,16 @@ function init (ctx, socket) {
 
     socket.on('bulletCrash', (id) => {
       delete bullets[id]
+    })
+
+    socket.on('bulletHit', (id, playerId) => {
+      console.log(playerId)
+      delete bullets[id]
+      if (playerId === window.id) {
+        console.log('game over!')
+      } else {
+        delete opponents[playerId]
+      }
     })
 
     socket.on('player', (id, coords) => {
