@@ -37,25 +37,25 @@ class SpriteSheet {
   getSprites (sizes) {
     let sprites = {}
     let x = 0
-    let max_h = 0
-    
+    let maxH = 0
+
     for (let [w, h] of sizes) {
       sprites.push(this.get_raw_sprite(x, w, h))
       x += w
-      if (h > max_h) {
-        max_h = h
+      if (h > maxH) {
+        maxH = h
       }
     }
 
-    this.farthest_y += max_h
+    this.farthest_y += maxH
     return sprites
   }
 
   getSimilarSprites (sizes, constant, index) {
     let sprites = {}
     let x = 0
-    let max_h = 0
-    
+    let maxH = 0
+
     for (let dimension of sizes) {
       let w, h
       if (constant === 'w') {
@@ -68,16 +68,16 @@ class SpriteSheet {
 
       sprites.push(this.get_raw_sprite(x, w, h))
       x += w
-      if (h > max_h) {
-        max_h = h
+      if (h > maxH) {
+        maxH = h
       }
     }
 
-    this.farthest_y += max_h
+    this.farthest_y += maxH
     return sprites
   }
 
-  getEqualSprites(w, h, constant) {
+  getEqualSprites (w, h, constant) {
     let sprites = {}
     let x = 0
     for (let i = 0; i < constant; i++) {

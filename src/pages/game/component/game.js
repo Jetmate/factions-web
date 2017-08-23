@@ -5,7 +5,7 @@ import Opponent from './Opponent.js'
 import Bullet from './Bullet.js'
 
 import { convertFromGrid } from './helpers.js'
-import { GRID_WIDTH, GRID_HEIGHT, SCALE_FACTOR, BLOCK_WIDTH, WIDTH, HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT, UPDATE_WAIT, KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN, GRID_COLOR } from './constants.js'
+import { GRID_WIDTH, GRID_HEIGHT, BLOCK_WIDTH, WIDTH, HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT, UPDATE_WAIT, KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN, GRID_COLOR } from './constants.js'
 
 function main (ctx, grid, player, opponents, bullets) {
   player.execute(grid)
@@ -60,24 +60,20 @@ function drawGrid (ctx, grid, coordsFunc) {
   }
 }
 
-
-
 let ctx, socket
 
 document.addEventListener('finishCanvasInit', (event) => {
-  p('FINISH CTX EVENT')
+  console.log('FINISH CTX EVENT')
   if (socket) {
-    p('START')
+    console.log('START')
     init(ctx, socket)
   } else {
     document.addEventListener('finishSocketInit', (event) => {
-      p('DELAYED START')
+      console.log('DELAYED START')
       init(ctx, socket)
     })
   }
 })
-
-
 
 function init (ctx, socket) {
   let grid = JSON.parse(window.grid)
@@ -86,14 +82,14 @@ function init (ctx, socket) {
 
   const spriteSheetImage = new Image()
   spriteSheetImage.src = 'media/spritesheet.png'
-  
+
   spriteSheetImage.onload = () => {
     const spriteSheet = new SpriteSheet(spriteSheetImage)
     const playerSprite = spriteSheet.getSprite(12, 8, true)
     const bulletSprite = spriteSheet.getSprite(3, 4, true)
 
     let player = new Player(convertFromGrid(JSON.parse(window.coords)), new SpriteManager(playerSprite), socket, bulletSprite)
-    
+
     socket.emit('new', window.id, player.coords)
 
     socket.on('newBullet', (id, coords, rotation) => {
@@ -104,7 +100,7 @@ function init (ctx, socket) {
     socket.on('player', (id, coords) => {
       opponents[id] = new Opponent(coords, new SpriteManager(playerSprite))
       // console.log('OPPONENTS', opponents)
-      // console.log('RECEIVED PLAYER:', id) 
+      // console.log('RECEIVED PLAYER:', id)
     })
 
 
@@ -146,9 +142,8 @@ function init (ctx, socket) {
 }
 
 function initInput (player) {
-  p('INITINPUT')
+  console.log('INITINPUT')
   document.addEventListener('keydown', (event) => {
-    let action
     switch (event.keyCode) {
       case KEY_LEFT:
         player.move('LEFT')
@@ -162,14 +157,10 @@ function initInput (player) {
       case KEY_DOWN:
         player.move('DOWN')
         break
-
-      default:
-        return
     }
   })
 
   document.addEventListener('keyup', (event) => {
-    let action
     switch (event.keyCode) {
       case KEY_LEFT:
         player.unmove('LEFT')
@@ -183,9 +174,6 @@ function initInput (player) {
       case KEY_DOWN:
         player.unmove('DOWN')
         break
-
-      default:
-        return
     }
   })
 
@@ -200,7 +188,7 @@ function initInput (player) {
 
 
 export function setCanvas (canvas) {
-  p('INITCANVAS')
+  console.log('INITCANVAS')
   canvas.width = CANVAS_WIDTH
   canvas.height = CANVAS_HEIGHT
   ctx = canvas.getContext('2d')
@@ -210,7 +198,7 @@ export function setCanvas (canvas) {
 }
 
 export function setSocket (socket_) {
-  p('INITSOCKET')
+  console.log('INITSOCKET')
   socket = socket_
 
   const event = new Event('finishSocketInit')

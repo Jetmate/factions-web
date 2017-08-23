@@ -11,7 +11,7 @@ export default class Player {
     this.size = [spriteManager.canvas.width, spriteManager.canvas.height]
     this.coords = findCenter([BLOCK_WIDTH, BLOCK_WIDTH], this.size, coords)
     this.fakeCoords = findCenter([CANVAS_WIDTH, CANVAS_HEIGHT], this.size)
-    this.fakeCenterCoords = [CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2] 
+    this.fakeCenterCoords = [CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2]
     this.velocity = [0, 0]
     this.rotation = 0
     this.directions = {'RIGHT': false, 'LEFT': false, 'UP': false, 'DOWN': false}
@@ -41,7 +41,7 @@ export default class Player {
         this.velocity[1] = this.SPEED
         this.directions['DOWN'] = true
         break
-      } 
+      }
     }
   }
 
@@ -66,7 +66,7 @@ export default class Player {
         this.velocity[1] = (this.directions['UP'] ? -this.SPEED : 0)
         this.directions['DOWN'] = false
         break
-      } 
+      }
     }
   }
 
@@ -109,7 +109,7 @@ export default class Player {
   }
 
   shoot (cursorX, cursorY) {
-    let bullet = new Bullet(generateId(), this.rotation, [this.coords[0] + this.size[0] / 2, this.coords[1] + this.size[1] / 2], new SpriteManager(this.bulletSprite))
+    let bullet = new Bullet(generateId(), this.rotation, [this.coords[0] + this.bulletCoords[0], this.coords[1] + this.bulletCoords[1]], new SpriteManager(this.bulletSprite))
     this.socket.emit('newBullet', bullet.id, this.coords, this.rotation)
     this.bullets.push(bullet)
   }

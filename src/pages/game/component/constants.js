@@ -1,4 +1,4 @@
-export const 
+export const
   GRID_WIDTH = window.GRID_WIDTH,
   GRID_HEIGHT = window.GRID_HEIGHT,
   SCALE_FACTOR = 3,
@@ -10,13 +10,13 @@ export const
 
   UPDATE_WAIT = 33,
 
-  ///// ARROW KEYS
+  /// ARROW KEYS
   // KEY_RIGHT = 39,
   // KEY_LEFT = 37,
   // KEY_UP = 38,
   // KEY_DOWN = 40,
 
-  ///// WASD
+  /// WASD
   KEY_RIGHT = 68,
   KEY_LEFT = 65,
   KEY_UP = 87,

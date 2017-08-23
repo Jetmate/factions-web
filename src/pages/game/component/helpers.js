@@ -6,7 +6,7 @@ export function opposite (number) {
 
 export function convertToGrid (x, y) {
   return [(x / BLOCK_WIDTH) >> 0, (y / BLOCK_WIDTH) >> 0]
-} 
+}
 
 export function findAllGridCoords (coords, size) {
   let allCoords = []
@@ -40,7 +40,7 @@ export function findCenter (size1, size2, coords) {
     return [
       (size1[0] / 2 - size2[0] / 2) + coords[0],
       (size1[1] / 2 - size2[1] / 2) + coords[1]
-    ]  
+    ]
   }
   return [
     size1[0] / 2 - size2[0] / 2,

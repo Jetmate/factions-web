@@ -5,7 +5,7 @@ export default class SpriteManager {
   constructor (sprite) {
     this.sprite = sprite
     this.canvas = document.createElement('canvas')
-    
+
     this.diagonal = Math.sqrt(this.sprite.width ** 2 + this.sprite.height ** 2) >> 0
     this.translation1 = this.diagonal / 2 >> 0
     let centerCoords = findCenter([this.diagonal, this.diagonal], [this.sprite.width, this.sprite.height])
@@ -19,7 +19,7 @@ export default class SpriteManager {
   }
 
   rotate (rotation) {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
     this.ctx.scale(SCALE_FACTOR, SCALE_FACTOR)
     this.ctx.translate(this.translation1, this.translation1)
     this.ctx.rotate(rotation)
