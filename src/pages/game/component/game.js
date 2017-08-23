@@ -19,8 +19,8 @@ function main (ctx, grid, player, opponents, bullets) {
   drawOutline(ctx, player.generateDisplayCoords)
   drawGrid(ctx, grid, player.generateDisplayCoords)
   for (let id in bullets) {
-    console.log(id)
-    console.log(bullets[id])
+    // console.log(id)
+    // console.log(bullets[id])
     bullets[id].draw(ctx, player.generateDisplayCoords)
   }
   player.drawBullets(ctx)
@@ -94,26 +94,29 @@ function init (ctx, socket) {
 
     socket.on('newBullet', (id, coords, rotation) => {
       bullets[id] = new Bullet(id, rotation, coords, new SpriteManager(bulletSprite))
-      console.log(coords)
+    })
+
+    socket.on('bulletCrash', (id) => {
+      delete bullets[id]
     })
 
     socket.on('player', (id, coords) => {
       opponents[id] = new Opponent(coords, new SpriteManager(playerSprite))
-      // console.log('OPPONENTS', opponents)
-      // console.log('RECEIVED PLAYER:', id)
+      console.log('OPPONENTS', opponents)
+      console.log('RECEIVED PLAYER:', id)
     })
 
 
     socket.on('new', (id, coords) => {
       opponents[id] = new Opponent(coords, new SpriteManager(playerSprite))
-      // console.log('OPPONENTS', opponents)
-      // console.log('NEW PLAYER:', id)
+      console.log('OPPONENTS', opponents)
+      console.log('NEW PLAYER:', id)
       socket.emit('player', window.id, player.coords)
     })
 
 
     socket.on('close', (id) => {
-      // console.log('CLOSE', id)
+      console.log('CLOSE', id)
       delete opponents[id]
     })
 

@@ -122,6 +122,10 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('newBullet', bulletId, coords, rotation)
   })
 
+  socket.on('bulletCrash', (bulletId) => {
+    socket.broadcast.emit('bulletCrash', bulletId)
+  })
+
   socket.on('new', (id, coords) => {
     socket.broadcast.emit('new', id, coords)
   })

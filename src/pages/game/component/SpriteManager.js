@@ -16,7 +16,7 @@ export default class SpriteManager {
     this.canvas.height = this.canvas.width
     this.ctx = this.canvas.getContext('2d')
     this.ctx.imageSmoothingEnabled = false
-    this.rotation = 0
+    this.rotate(0)
   }
 
   rotate (rotation) {

@@ -148,6 +148,10 @@ io.on('connection', function (socket) {
     socket.broadcast.emit('newBullet', bulletId, coords, rotation);
   });
 
+  socket.on('bulletCrash', function (bulletId) {
+    socket.broadcast.emit('bulletCrash', bulletId);
+  });
+
   socket.on('new', function (id, coords) {
     socket.broadcast.emit('new', id, coords);
   });

@@ -124,8 +124,16 @@ export default class Player {
   }
 
   moveBullets () {
+    let crashedBullets = []
     for (let i = 0; i < this.bullets.length; i++) {
       this.bullets[i].move()
+      if (!withinBounds(this.bullets[i].coords, this.bullets[i].spriteManager.size)) {
+        this.socket.emit('bulletCrash', this.bullets[i].id)
+        crashedBullets.push(i)
+      }
+    }
+    for (let i = 0; i < crashedBullets.length; i++) {
+      this.bullets.splice(crashedBullets[i], 1)
     }
   }
 
