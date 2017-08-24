@@ -63,13 +63,13 @@ function drawGrid (ctx, grid, coordsFunc) {
 let ctx, socket
 
 document.addEventListener('finishCanvasInit', (event) => {
-  console.log('FINISH CTX EVENT')
+  // console.log('FINISH CTX EVENT')
   if (socket) {
-    console.log('START')
+    // console.log('START')
     init(ctx, socket)
   } else {
     document.addEventListener('finishSocketInit', (event) => {
-      console.log('DELAYED START')
+      // console.log('DELAYED START')
       init(ctx, socket)
     })
   }
@@ -109,15 +109,15 @@ function init (ctx, socket) {
 
     socket.on('player', (id, coords) => {
       opponents[id] = new Opponent(coords, new SpriteManager(playerSprite))
-      console.log('OPPONENTS', opponents)
       console.log('RECEIVED PLAYER:', id)
+      console.log('OPPONENTS', opponents)
     })
 
 
     socket.on('new', (id, coords) => {
       opponents[id] = new Opponent(coords, new SpriteManager(playerSprite))
-      console.log('OPPONENTS', opponents)
       console.log('NEW PLAYER:', id)
+      console.log('OPPONENTS', opponents)
       socket.emit('player', window.id, player.coords)
     })
 
@@ -199,7 +199,7 @@ function initInput (player) {
 
 export function setCanvas (canvas) {
   if (canvas) {
-    console.log('INITCANVAS')
+    // console.log('INITCANVAS')
     canvas.width = CANVAS_WIDTH
     canvas.height = CANVAS_HEIGHT
     ctx = canvas.getContext('2d')
@@ -211,7 +211,7 @@ export function setCanvas (canvas) {
 
 export function setSocket (socket_) {
   if (socket_) {
-    console.log('INITSOCKET')
+    // console.log('INITSOCKET')
     socket = socket_
 
     const event = new Event('finishSocketInit')

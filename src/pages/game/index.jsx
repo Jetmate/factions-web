@@ -13,6 +13,7 @@ class Main extends React.Component {
   constructor (props) {
     super(props)
     window.onbeforeunload = () => {
+      console.log('CLOSING EVENT EMMITED')
       this.socket.emit('close', window.id)
     }
 
