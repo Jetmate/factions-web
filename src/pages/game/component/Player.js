@@ -131,9 +131,9 @@ export default class Player {
         crashedBullets.push(i)
       } else {
         for (let id in players) {
-          console.log(checkCollision(players[id], this.bullets[i]))
+          // console.log(checkCollision(players[id], this.bullets[i]))
           if (checkCollision(players[id], this.bullets[i])) {
-            console.log(id)
+            // console.log(id)
             this.socket.emit('bulletHit', this.bullets[i].id, id)
             crashedBullets.push(i)
             delete players[id]

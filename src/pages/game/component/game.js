@@ -132,7 +132,9 @@ function init (ctx, socket) {
       // console.log('OPPONENTS', opponents)
       // console.log('ACTION:', id)
       // console.log('CHANGE', type, value)
-      opponents[id].processChange(type, value)
+      if (id in opponents) {
+        opponents[id].processChange(type, value)
+      }
     })
 
     initInput(player)
@@ -152,7 +154,7 @@ function init (ctx, socket) {
 }
 
 function initInput (player) {
-  console.log('INITINPUT')
+  // console.log('INITINPUT')
   document.addEventListener('keydown', (event) => {
     switch (event.keyCode) {
       case KEY_LEFT:

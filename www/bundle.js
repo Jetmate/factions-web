@@ -26904,7 +26904,9 @@ function init(ctx, socket) {
       // console.log('OPPONENTS', opponents)
       // console.log('ACTION:', id)
       // console.log('CHANGE', type, value)
-      opponents[id].processChange(type, value);
+      if (id in opponents) {
+        opponents[id].processChange(type, value);
+      }
     });
 
     initInput(player);
@@ -26924,7 +26926,7 @@ function init(ctx, socket) {
 }
 
 function initInput(player) {
-  console.log('INITINPUT');
+  // console.log('INITINPUT')
   document.addEventListener('keydown', function (event) {
     switch (event.keyCode) {
       case _constants.KEY_LEFT:
@@ -27317,9 +27319,9 @@ var Player = function () {
           crashedBullets.push(i);
         } else {
           for (var id in players) {
-            console.log((0, _helpers.checkCollision)(players[id], this.bullets[i]));
+            // console.log(checkCollision(players[id], this.bullets[i]))
             if ((0, _helpers.checkCollision)(players[id], this.bullets[i])) {
-              console.log(id);
+              // console.log(id)
               this.socket.emit('bulletHit', this.bullets[i].id, id);
               crashedBullets.push(i);
               delete players[id];
