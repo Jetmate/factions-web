@@ -17,7 +17,7 @@ class Main extends React.Component {
       this.socket.emit('close', window.id)
     }
 
-    this.socket.on('bulletHit', (id, playerId) => {
+    this.socket.on('playerDeath', (playerId) => {
       if (playerId === window.id) {
         this.setState({gameOver: true})
       }

@@ -138,6 +138,10 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('player', id, coords)
   })
 
+  socket.on('playerDeath', (id) => {
+    socket.emit('playerDeath', id)
+  })
+
   socket.on('close', (id) => {
     socket.broadcast.emit('close', id)
   })

@@ -5713,7 +5713,10 @@ KEY_RIGHT = exports.KEY_RIGHT = 68,
     KEY_LEFT = exports.KEY_LEFT = 65,
     KEY_UP = exports.KEY_UP = 87,
     KEY_DOWN = exports.KEY_DOWN = 83,
-    GRID_COLOR = exports.GRID_COLOR = '#8e8e8e';
+    GRID_COLOR = exports.GRID_COLOR = '#8e8e8e',
+    HEALTH_BAR_COORDS = exports.HEALTH_BAR_COORDS = [100, 100],
+    HEALTH_BAR_SIZE = exports.HEALTH_BAR_SIZE = [100, 500],
+    HEALTH_BAR_COLOR = exports.HEALTH_BAR_COLOR = '#c0392b';
 
 /***/ }),
 /* 38 */
@@ -12075,8 +12078,8 @@ var Bullet = function () {
   _createClass(Bullet, [{
     key: "move",
     value: function move() {
-      this.coords[0] += Math.cos(this.direction) * this.SPEED;
-      this.coords[1] += Math.sin(this.direction) * this.SPEED;
+      this.coords[0] += Math.cos(this.direction) * this.SPEED >> 0;
+      this.coords[1] += Math.sin(this.direction) * this.SPEED >> 0;
     }
   }, {
     key: "draw",
@@ -26657,7 +26660,7 @@ var Main = function (_React$Component) {
       _this.socket.emit('close', window.id);
     };
 
-    _this.socket.on('bulletHit', function (id, playerId) {
+    _this.socket.on('playerDeath', function (playerId) {
       if (playerId === window.id) {
         _this.setState({ gameOver: true });
       }
@@ -26774,6 +26777,10 @@ var _Bullet = __webpack_require__(96);
 
 var _Bullet2 = _interopRequireDefault(_Bullet);
 
+var _HealthBar = __webpack_require__(248);
+
+var _HealthBar2 = _interopRequireDefault(_HealthBar);
+
 var _helpers = __webpack_require__(57);
 
 var _constants = __webpack_require__(37);
@@ -26801,6 +26808,7 @@ function main(ctx, grid, player, opponents, bullets) {
     opponents[_id2].draw(ctx, player.generateDisplayCoords);
   }
   player.draw(ctx);
+  player.healthBar.draw(ctx);
 }
 
 function drawOutline(ctx, coordsFunc) {
@@ -26863,7 +26871,7 @@ function init(ctx, socket) {
     var playerSprite = spriteSheet.getSprite(12, 8, true);
     var bulletSprite = spriteSheet.getSprite(3, 4, true);
     var bulletStart = [9 * _constants.SCALE_FACTOR, 5 * _constants.SCALE_FACTOR];
-    var player = new _Player2.default((0, _helpers.convertFromGrid)(JSON.parse(window.coords)), new _SpriteManager2.default(playerSprite), socket, bulletSprite, bulletStart);
+    var player = new _Player2.default((0, _helpers.convertFromGrid)(JSON.parse(window.coords)), new _SpriteManager2.default(playerSprite), socket, bulletSprite, bulletStart, new _HealthBar2.default(_constants.HEALTH_BAR_COORDS, _constants.HEALTH_BAR_SIZE, _constants.HEALTH_BAR_COLOR), 10);
 
     socket.emit('new', window.id, player.coords);
 
@@ -26876,9 +26884,10 @@ function init(ctx, socket) {
     });
 
     socket.on('bulletHit', function (id, playerId) {
+      console.log('HIT');
       delete bullets[id];
-      if (playerId in opponents) {
-        delete opponents[playerId];
+      if (playerId === window.id) {
+        player.takeDamage();
       }
     });
 
@@ -26886,6 +26895,13 @@ function init(ctx, socket) {
       opponents[id] = new _Opponent2.default(coords, new _SpriteManager2.default(playerSprite));
       console.log('RECEIVED PLAYER:', id);
       console.log('OPPONENTS', opponents);
+    });
+
+    socket.on('playerDeath', function (playerId) {
+      console.log('DEATH');
+      if (playerId in opponents) {
+        delete opponents[playerId];
+      }
     });
 
     socket.on('new', function (id, coords) {
@@ -27189,7 +27205,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Player = function () {
-  function Player(coords, spriteManager, socket, bulletSprite, bulletStart) {
+  function Player(coords, spriteManager, socket, bulletSprite, bulletStart, healthBar, health) {
     _classCallCheck(this, Player);
 
     _initialiseProps.call(this);
@@ -27205,6 +27221,8 @@ var Player = function () {
     this.bulletSprite = bulletSprite;
     this.bullets = [];
     this.bulletStartDiff = Math.sqrt(Math.pow(bulletStart[0] - Math.abs(this.spriteManager.size[0] / 2), 2) + Math.pow(bulletStart[1] - Math.abs(this.spriteManager.size[1] / 2), 2));
+    this.healthBar = healthBar;
+    this.health = this.initialHealth = health;
   }
 
   _createClass(Player, [{
@@ -27304,7 +27322,7 @@ var Player = function () {
   }, {
     key: 'shoot',
     value: function shoot(cursorX, cursorY) {
-      var bullet = new _Bullet2.default((0, _helpers.generateId)(), this.rotation, [this.coords[0] + this.spriteManager.size[0] / 2 + Math.cos(this.rotation) * this.bulletStartDiff, this.coords[1] + this.spriteManager.size[1] / 2 + Math.sin(this.rotation) * this.bulletStartDiff], new _SpriteManager2.default(this.bulletSprite));
+      var bullet = new _Bullet2.default((0, _helpers.generateId)(), this.rotation, [this.coords[0] + this.spriteManager.size[0] / 2 + Math.cos(this.rotation) * this.bulletStartDiff >> 0, this.coords[1] + this.spriteManager.size[1] / 2 + Math.sin(this.rotation) * this.bulletStartDiff >> 0], new _SpriteManager2.default(this.bulletSprite));
       this.socket.emit('newBullet', bullet.id, bullet.coords, this.rotation);
       this.bullets.push(bullet);
     }
@@ -27314,6 +27332,7 @@ var Player = function () {
       var crashedBullets = [];
       for (var i = 0; i < this.bullets.length; i++) {
         this.bullets[i].move();
+        // console.log(this.bullets[i].coords)
         if (!(0, _helpers.withinBounds)(this.bullets[i].coords, this.bullets[i].spriteManager.size)) {
           this.socket.emit('bulletCrash', this.bullets[i].id);
           crashedBullets.push(i);
@@ -27324,7 +27343,6 @@ var Player = function () {
               // console.log(id)
               this.socket.emit('bulletHit', this.bullets[i].id, id);
               crashedBullets.push(i);
-              delete players[id];
               break;
             }
           }
@@ -27340,6 +27358,15 @@ var Player = function () {
       for (var i = 0; i < this.bullets.length; i++) {
         this.bullets[i].draw(ctx, this.generateDisplayCoords);
       }
+    }
+  }, {
+    key: 'takeDamage',
+    value: function takeDamage() {
+      this.health--;
+      if (this.health === 0) {
+        this.socket.emit('playerDeath', window.id);
+      }
+      this.healthBar.changeHealth(this.health / this.initialHealth);
     }
   }]);
 
@@ -30645,6 +30672,49 @@ var Component = function (_React$Component) {
 }(_react2.default.Component);
 
 exports.default = Component;
+
+/***/ }),
+/* 248 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var HealthBar = function () {
+  function HealthBar(coords, size, color) {
+    _classCallCheck(this, HealthBar);
+
+    this.coords = coords;
+    this.initialSize = size;
+    this.height = this.initialSize[1];
+    this.color = color;
+  }
+
+  _createClass(HealthBar, [{
+    key: "changeHealth",
+    value: function changeHealth(percentage) {
+      this.height = this.initialSize[1] * percentage;
+    }
+  }, {
+    key: "draw",
+    value: function draw(ctx) {
+      ctx.fillStyle = this.color;
+      ctx.fillRect(this.coords[0], this.coords[1], this.initialSize[0], this.height);
+    }
+  }]);
+
+  return HealthBar;
+}();
+
+exports.default = HealthBar;
 
 /***/ })
 /******/ ]);

@@ -11,8 +11,8 @@ export default class Bullet {
   }
 
   move () {
-    this.coords[0] += Math.cos(this.direction) * this.SPEED
-    this.coords[1] += Math.sin(this.direction) * this.SPEED
+    this.coords[0] += Math.cos(this.direction) * this.SPEED >> 0
+    this.coords[1] += Math.sin(this.direction) * this.SPEED >> 0
   }
 
   draw (ctx, coordsFunc) {

@@ -6,7 +6,7 @@ import SpriteManager from './SpriteManager.js'
 export default class Player {
   SPEED = 5
 
-  constructor (coords, spriteManager, socket, bulletSprite, bulletStart) {
+  constructor (coords, spriteManager, socket, bulletSprite, bulletStart, healthBar, health) {
     this.spriteManager = spriteManager
     this.coords = findCenter([BLOCK_WIDTH, BLOCK_WIDTH], this.spriteManager.size, coords)
     this.fakeCoords = findCenter([CANVAS_WIDTH, CANVAS_HEIGHT], this.spriteManager.size)
@@ -18,6 +18,8 @@ export default class Player {
     this.bulletSprite = bulletSprite
     this.bullets = []
     this.bulletStartDiff = Math.sqrt((bulletStart[0] - Math.abs(this.spriteManager.size[0] / 2)) ** 2 + (bulletStart[1] - Math.abs(this.spriteManager.size[1] / 2)) ** 2)
+    this.healthBar = healthBar
+    this.health = this.initialHealth = health
   }
 
   move (direction) {
@@ -113,8 +115,8 @@ export default class Player {
       generateId(),
       this.rotation,
       [
-        this.coords[0] + this.spriteManager.size[0] / 2 + Math.cos(this.rotation) * this.bulletStartDiff,
-        this.coords[1] + this.spriteManager.size[1] / 2 + Math.sin(this.rotation) * this.bulletStartDiff
+        this.coords[0] + this.spriteManager.size[0] / 2 + Math.cos(this.rotation) * this.bulletStartDiff >> 0,
+        this.coords[1] + this.spriteManager.size[1] / 2 + Math.sin(this.rotation) * this.bulletStartDiff >> 0
       ],
       new SpriteManager(this.bulletSprite)
     )
@@ -126,6 +128,7 @@ export default class Player {
     let crashedBullets = []
     for (let i = 0; i < this.bullets.length; i++) {
       this.bullets[i].move()
+      // console.log(this.bullets[i].coords)
       if (!withinBounds(this.bullets[i].coords, this.bullets[i].spriteManager.size)) {
         this.socket.emit('bulletCrash', this.bullets[i].id)
         crashedBullets.push(i)
@@ -136,7 +139,6 @@ export default class Player {
             // console.log(id)
             this.socket.emit('bulletHit', this.bullets[i].id, id)
             crashedBullets.push(i)
-            delete players[id]
             break
           }
         }
@@ -151,5 +153,13 @@ export default class Player {
     for (let i = 0; i < this.bullets.length; i++) {
       this.bullets[i].draw(ctx, this.generateDisplayCoords)
     }
+  }
+
+  takeDamage () {
+    this.health--
+    if (this.health === 0) {
+      this.socket.emit('playerDeath', window.id)
+    }
+    this.healthBar.changeHealth(this.health / this.initialHealth)
   }
 }

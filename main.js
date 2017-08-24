@@ -164,6 +164,10 @@ io.on('connection', function (socket) {
     socket.broadcast.emit('player', id, coords);
   });
 
+  socket.on('playerDeath', function (id) {
+    io.emit('playerDeath', id);
+  });
+
   socket.on('close', function (id) {
     socket.broadcast.emit('close', id);
   });

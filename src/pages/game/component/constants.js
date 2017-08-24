@@ -22,4 +22,8 @@ export const
   KEY_UP = 87,
   KEY_DOWN = 83,
 
-  GRID_COLOR = '#8e8e8e'
+  GRID_COLOR = '#8e8e8e',
+
+  HEALTH_BAR_COORDS = [100, 100],
+  HEALTH_BAR_SIZE = [100, 500],
+  HEALTH_BAR_COLOR = '#c0392b'
