@@ -24,6 +24,7 @@
     "express-session": "^1.15.5",
     "hbs": "^4.0.1",
     "helmet": "^3.6.1",
+    "package.json": "^2.0.1",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "socket.io": "^2.0.2",
