@@ -101,11 +101,8 @@ function init (ctx, socket) {
     })
 
     socket.on('bulletHit', (id, playerId) => {
-      console.log(playerId)
       delete bullets[id]
-      if (playerId === window.id) {
-        console.log('game over!')
-      } else {
+      if (playerId in opponents) {
         delete opponents[playerId]
       }
     })
@@ -201,19 +198,23 @@ function initInput (player) {
 
 
 export function setCanvas (canvas) {
-  console.log('INITCANVAS')
-  canvas.width = CANVAS_WIDTH
-  canvas.height = CANVAS_HEIGHT
-  ctx = canvas.getContext('2d')
+  if (canvas) {
+    console.log('INITCANVAS')
+    canvas.width = CANVAS_WIDTH
+    canvas.height = CANVAS_HEIGHT
+    ctx = canvas.getContext('2d')
 
-  const event = new Event('finishCanvasInit')
-  document.dispatchEvent(event)
+    const event = new Event('finishCanvasInit')
+    document.dispatchEvent(event)
+  }
 }
 
 export function setSocket (socket_) {
-  console.log('INITSOCKET')
-  socket = socket_
+  if (socket_) {
+    console.log('INITSOCKET')
+    socket = socket_
 
-  const event = new Event('finishSocketInit')
-  document.dispatchEvent(event)
+    const event = new Event('finishSocketInit')
+    document.dispatchEvent(event)
+  }
 }
