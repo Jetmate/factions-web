@@ -139,7 +139,7 @@ io.on('connection', (socket) => {
   })
 
   socket.on('playerDeath', (id) => {
-    socket.emit('playerDeath', id)
+    io.emit('playerDeath', id)
   })
 
   socket.on('close', (id) => {

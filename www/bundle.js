@@ -1828,7 +1828,7 @@ function getPooledWarningPropertyDefinition(propName, getVal) {
  * Expose `debug()` as the module.
  */
 
-exports = module.exports = __webpack_require__(224);
+exports = module.exports = __webpack_require__(225);
 exports.log = log;
 exports.formatArgs = formatArgs;
 exports.save = save;
@@ -3344,15 +3344,15 @@ Emitter.prototype.hasListeners = function(event){
  * Module dependencies.
  */
 
-var keys = __webpack_require__(234);
+var keys = __webpack_require__(235);
 var hasBinary = __webpack_require__(98);
-var sliceBuffer = __webpack_require__(235);
-var after = __webpack_require__(236);
-var utf8 = __webpack_require__(237);
+var sliceBuffer = __webpack_require__(236);
+var after = __webpack_require__(237);
+var utf8 = __webpack_require__(238);
 
 var base64encoder;
 if (global && global.ArrayBuffer) {
-  base64encoder = __webpack_require__(239);
+  base64encoder = __webpack_require__(240);
 }
 
 /**
@@ -3410,7 +3410,7 @@ var err = { type: 'error', data: 'parser error' };
  * Create a blob api even for blob builder when vendor prefixes exist
  */
 
-var Blob = __webpack_require__(240);
+var Blob = __webpack_require__(241);
 
 /**
  * Encodes a packet.
@@ -7759,7 +7759,7 @@ function checkCollision(thing1, thing2) {
 var debug = __webpack_require__(14)('socket.io-parser');
 var Emitter = __webpack_require__(22);
 var hasBin = __webpack_require__(98);
-var binary = __webpack_require__(227);
+var binary = __webpack_require__(228);
 var isBuf = __webpack_require__(99);
 
 /**
@@ -8159,7 +8159,7 @@ function error() {
 
 /* WEBPACK VAR INJECTION */(function(global) {// browser shim for xmlhttprequest module
 
-var hasCORS = __webpack_require__(232);
+var hasCORS = __webpack_require__(233);
 
 module.exports = function (opts) {
   var xdomain = opts.xdomain;
@@ -12153,7 +12153,7 @@ module.exports = function parseuri(str) {
  * Module requirements.
  */
 
-var isArray = __webpack_require__(226);
+var isArray = __webpack_require__(227);
 
 var toString = Object.prototype.toString;
 var withNativeBlob = typeof global.Blob === 'function' || toString.call(global.Blob) === '[object BlobConstructor]';
@@ -12241,7 +12241,7 @@ function isBuf(obj) {
  * Module dependencies.
  */
 
-var eio = __webpack_require__(229);
+var eio = __webpack_require__(230);
 var Socket = __webpack_require__(105);
 var Emitter = __webpack_require__(22);
 var parser = __webpack_require__(58);
@@ -12249,7 +12249,7 @@ var on = __webpack_require__(106);
 var bind = __webpack_require__(107);
 var debug = __webpack_require__(14)('socket.io-client:manager');
 var indexOf = __webpack_require__(104);
-var Backoff = __webpack_require__(246);
+var Backoff = __webpack_require__(247);
 
 /**
  * IE6+ hasOwnProperty
@@ -12820,9 +12820,9 @@ Manager.prototype.onreconnect = function () {
  */
 
 var XMLHttpRequest = __webpack_require__(59);
-var XHR = __webpack_require__(233);
-var JSONP = __webpack_require__(241);
-var websocket = __webpack_require__(242);
+var XHR = __webpack_require__(234);
+var JSONP = __webpack_require__(242);
+var websocket = __webpack_require__(243);
 
 /**
  * Export transports.
@@ -13223,7 +13223,7 @@ module.exports = function(arr, obj){
 
 var parser = __webpack_require__(58);
 var Emitter = __webpack_require__(22);
-var toArray = __webpack_require__(245);
+var toArray = __webpack_require__(246);
 var on = __webpack_require__(106);
 var bind = __webpack_require__(107);
 var debug = __webpack_require__(14)('socket.io-client:socket');
@@ -13722,7 +13722,7 @@ var _index3 = __webpack_require__(216);
 
 var _index4 = _interopRequireDefault(_index3);
 
-var _index5 = __webpack_require__(247);
+var _index5 = __webpack_require__(248);
 
 var _index6 = _interopRequireDefault(_index5);
 
@@ -26630,7 +26630,7 @@ var _game = __webpack_require__(217);
 
 var _game2 = _interopRequireDefault(_game);
 
-var _socket = __webpack_require__(222);
+var _socket = __webpack_require__(223);
 
 var _socket2 = _interopRequireDefault(_socket);
 
@@ -26777,7 +26777,7 @@ var _Bullet = __webpack_require__(96);
 
 var _Bullet2 = _interopRequireDefault(_Bullet);
 
-var _HealthBar = __webpack_require__(248);
+var _HealthBar = __webpack_require__(222);
 
 var _HealthBar2 = _interopRequireDefault(_HealthBar);
 
@@ -27447,12 +27447,55 @@ exports.default = Opponent;
 /* 222 */
 /***/ (function(module, exports, __webpack_require__) {
 
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var HealthBar = function () {
+  function HealthBar(coords, size, color) {
+    _classCallCheck(this, HealthBar);
+
+    this.coords = coords;
+    this.initialSize = size;
+    this.height = this.initialSize[1];
+    this.color = color;
+  }
+
+  _createClass(HealthBar, [{
+    key: "changeHealth",
+    value: function changeHealth(percentage) {
+      this.height = this.initialSize[1] * percentage;
+    }
+  }, {
+    key: "draw",
+    value: function draw(ctx) {
+      ctx.fillStyle = this.color;
+      ctx.fillRect(this.coords[0], this.coords[1], this.initialSize[0], this.height);
+    }
+  }]);
+
+  return HealthBar;
+}();
+
+exports.default = HealthBar;
+
+/***/ }),
+/* 223 */
+/***/ (function(module, exports, __webpack_require__) {
+
 
 /**
  * Module dependencies.
  */
 
-var url = __webpack_require__(223);
+var url = __webpack_require__(224);
 var parser = __webpack_require__(58);
 var Manager = __webpack_require__(100);
 var debug = __webpack_require__(14)('socket.io-client');
@@ -27544,7 +27587,7 @@ exports.Socket = __webpack_require__(105);
 
 
 /***/ }),
-/* 223 */
+/* 224 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {
@@ -27626,7 +27669,7 @@ function url (uri, loc) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
 
 /***/ }),
-/* 224 */
+/* 225 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -27642,7 +27685,7 @@ exports.coerce = coerce;
 exports.disable = disable;
 exports.enable = enable;
 exports.enabled = enabled;
-exports.humanize = __webpack_require__(225);
+exports.humanize = __webpack_require__(226);
 
 /**
  * The currently active debug mode names, and names to skip.
@@ -27834,7 +27877,7 @@ function coerce(val) {
 
 
 /***/ }),
-/* 225 */
+/* 226 */
 /***/ (function(module, exports) {
 
 /**
@@ -27992,7 +28035,7 @@ function plural(ms, n, name) {
 
 
 /***/ }),
-/* 226 */
+/* 227 */
 /***/ (function(module, exports) {
 
 var toString = {}.toString;
@@ -28003,7 +28046,7 @@ module.exports = Array.isArray || function (arr) {
 
 
 /***/ }),
-/* 227 */
+/* 228 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {/*global Blob,File*/
@@ -28012,7 +28055,7 @@ module.exports = Array.isArray || function (arr) {
  * Module requirements
  */
 
-var isArray = __webpack_require__(228);
+var isArray = __webpack_require__(229);
 var isBuf = __webpack_require__(99);
 var toString = Object.prototype.toString;
 var withNativeBlob = typeof global.Blob === 'function' || toString.call(global.Blob) === '[object BlobConstructor]';
@@ -28151,7 +28194,7 @@ exports.removeBlobs = function(data, callback) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
 
 /***/ }),
-/* 228 */
+/* 229 */
 /***/ (function(module, exports) {
 
 var toString = {}.toString;
@@ -28162,19 +28205,19 @@ module.exports = Array.isArray || function (arr) {
 
 
 /***/ }),
-/* 229 */
-/***/ (function(module, exports, __webpack_require__) {
-
-
-module.exports = __webpack_require__(230);
-
-
-/***/ }),
 /* 230 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
 module.exports = __webpack_require__(231);
+
+
+/***/ }),
+/* 231 */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+module.exports = __webpack_require__(232);
 
 /**
  * Exports parser
@@ -28186,7 +28229,7 @@ module.exports.parser = __webpack_require__(23);
 
 
 /***/ }),
-/* 231 */
+/* 232 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {/**
@@ -28199,7 +28242,7 @@ var debug = __webpack_require__(14)('engine.io-client:socket');
 var index = __webpack_require__(104);
 var parser = __webpack_require__(23);
 var parseuri = __webpack_require__(97);
-var parsejson = __webpack_require__(244);
+var parsejson = __webpack_require__(245);
 var parseqs = __webpack_require__(38);
 
 /**
@@ -28937,7 +28980,7 @@ Socket.prototype.filterUpgrades = function (upgrades) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
 
 /***/ }),
-/* 232 */
+/* 233 */
 /***/ (function(module, exports) {
 
 
@@ -28960,7 +29003,7 @@ try {
 
 
 /***/ }),
-/* 233 */
+/* 234 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {/**
@@ -29380,7 +29423,7 @@ function unloadHandler () {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
 
 /***/ }),
-/* 234 */
+/* 235 */
 /***/ (function(module, exports) {
 
 
@@ -29405,7 +29448,7 @@ module.exports = Object.keys || function keys (obj){
 
 
 /***/ }),
-/* 235 */
+/* 236 */
 /***/ (function(module, exports) {
 
 /**
@@ -29440,7 +29483,7 @@ module.exports = function(arraybuffer, start, end) {
 
 
 /***/ }),
-/* 236 */
+/* 237 */
 /***/ (function(module, exports) {
 
 module.exports = after
@@ -29474,7 +29517,7 @@ function noop() {}
 
 
 /***/ }),
-/* 237 */
+/* 238 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module, global) {var __WEBPACK_AMD_DEFINE_RESULT__;/*! https://mths.be/utf8js v2.1.2 by @mathias */
@@ -29732,10 +29775,10 @@ function noop() {}
 
 }(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(238)(module), __webpack_require__(7)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(239)(module), __webpack_require__(7)))
 
 /***/ }),
-/* 238 */
+/* 239 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -29763,7 +29806,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 239 */
+/* 240 */
 /***/ (function(module, exports) {
 
 /*
@@ -29836,7 +29879,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 240 */
+/* 241 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {/**
@@ -29939,7 +29982,7 @@ module.exports = (function() {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
 
 /***/ }),
-/* 241 */
+/* 242 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {
@@ -30177,7 +30220,7 @@ JSONPPolling.prototype.doWrite = function (data, fn) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
 
 /***/ }),
-/* 242 */
+/* 243 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {/**
@@ -30194,7 +30237,7 @@ var BrowserWebSocket = global.WebSocket || global.MozWebSocket;
 var NodeWebSocket;
 if (typeof window === 'undefined') {
   try {
-    NodeWebSocket = __webpack_require__(243);
+    NodeWebSocket = __webpack_require__(244);
   } catch (e) { }
 }
 
@@ -30470,13 +30513,13 @@ WS.prototype.check = function () {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
 
 /***/ }),
-/* 243 */
+/* 244 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 244 */
+/* 245 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {/**
@@ -30514,7 +30557,7 @@ module.exports = function parsejson(data) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
 
 /***/ }),
-/* 245 */
+/* 246 */
 /***/ (function(module, exports) {
 
 module.exports = toArray
@@ -30533,7 +30576,7 @@ function toArray(list, index) {
 
 
 /***/ }),
-/* 246 */
+/* 247 */
 /***/ (function(module, exports) {
 
 
@@ -30624,7 +30667,7 @@ Backoff.prototype.setJitter = function(jitter){
 
 
 /***/ }),
-/* 247 */
+/* 248 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -30672,49 +30715,6 @@ var Component = function (_React$Component) {
 }(_react2.default.Component);
 
 exports.default = Component;
-
-/***/ }),
-/* 248 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var HealthBar = function () {
-  function HealthBar(coords, size, color) {
-    _classCallCheck(this, HealthBar);
-
-    this.coords = coords;
-    this.initialSize = size;
-    this.height = this.initialSize[1];
-    this.color = color;
-  }
-
-  _createClass(HealthBar, [{
-    key: "changeHealth",
-    value: function changeHealth(percentage) {
-      this.height = this.initialSize[1] * percentage;
-    }
-  }, {
-    key: "draw",
-    value: function draw(ctx) {
-      ctx.fillStyle = this.color;
-      ctx.fillRect(this.coords[0], this.coords[1], this.initialSize[0], this.height);
-    }
-  }]);
-
-  return HealthBar;
-}();
-
-exports.default = HealthBar;
 
 /***/ })
 /******/ ]);
