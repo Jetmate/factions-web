@@ -118,8 +118,8 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('playerChange', id, type, action)
   })
 
-  socket.on('newBullet', (bulletId, coords, rotation) => {
-    socket.broadcast.emit('newBullet', bulletId, coords, rotation)
+  socket.on('newBullet', (bulletId, coords, rotation, velocity) => {
+    socket.broadcast.emit('newBullet', bulletId, coords, rotation, velocity)
   })
 
   socket.on('bulletCrash', (bulletId) => {

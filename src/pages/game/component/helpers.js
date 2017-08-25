@@ -78,3 +78,7 @@ export function checkCollision (thing1, thing2) {
          (thing1.coords[1] < thing2.coords[1] + thing2.spriteManager.size[1]) &&
          (thing2.coords[1] < thing1.coords[1] + thing1.spriteManager.size[1])
 }
+
+export function hypotenuse (coords) {
+  return Math.sqrt(coords[0] ** 2 + coords[1] ** 2)
+}

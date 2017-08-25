@@ -7,6 +7,7 @@ export const
   HEIGHT = GRID_HEIGHT * BLOCK_WIDTH,
   CANVAS_WIDTH = window.innerWidth,
   CANVAS_HEIGHT = window.innerHeight,
+  CENTER = [CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2],
 
   UPDATE_WAIT = 33,
 
@@ -26,4 +27,7 @@ export const
 
   HEALTH_BAR_COORDS = [100, 100],
   HEALTH_BAR_SIZE = [100, 500],
-  HEALTH_BAR_COLOR = '#c0392b'
+  HEALTH_BAR_COLOR = '#c0392b',
+
+  BULLET_SPEED = 40,
+  PLAYER_SPEED = 5

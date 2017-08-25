@@ -1,23 +1,20 @@
-import { findCenter, withinBounds, generateId, checkCollision } from './helpers.js'
-import { BLOCK_WIDTH, CANVAS_WIDTH, CANVAS_HEIGHT } from './constants.js'
+import { findCenter, withinBounds, generateId, checkCollision, hypotenuse } from './helpers.js'
+import { BLOCK_WIDTH, CANVAS_WIDTH, CANVAS_HEIGHT, CENTER, BULLET_SPEED, PLAYER_SPEED } from './constants.js'
 import Bullet from './Bullet.js'
 import SpriteManager from './SpriteManager.js'
 
 export default class Player {
-  SPEED = 5
-
   constructor (coords, spriteManager, socket, bulletSprite, bulletStart, healthBar, health) {
     this.spriteManager = spriteManager
     this.coords = findCenter([BLOCK_WIDTH, BLOCK_WIDTH], this.spriteManager.size, coords)
     this.fakeCoords = findCenter([CANVAS_WIDTH, CANVAS_HEIGHT], this.spriteManager.size)
-    this.fakeCenterCoords = [CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2]
     this.velocity = [0, 0]
     this.rotation = 0
     this.directions = {'RIGHT': false, 'LEFT': false, 'UP': false, 'DOWN': false}
     this.socket = socket
     this.bulletSprite = bulletSprite
     this.bullets = []
-    this.bulletStartDiff = Math.sqrt((bulletStart[0] - Math.abs(this.spriteManager.size[0] / 2)) ** 2 + (bulletStart[1] - Math.abs(this.spriteManager.size[1] / 2)) ** 2)
+    this.bulletStartDiff = hypotenuse([bulletStart[0] - this.spriteManager.size[0] / 2, bulletStart[1] - this.spriteManager.size[1] / 2])
     this.healthBar = healthBar
     this.health = this.initialHealth = health
   }
@@ -25,22 +22,22 @@ export default class Player {
   move (direction) {
     switch (direction) {
       case 'RIGHT': {
-        this.velocity[0] = this.SPEED
+        this.velocity[0] = PLAYER_SPEED
         this.directions['RIGHT'] = true
         break
       }
       case 'LEFT': {
-        this.velocity[0] = -this.SPEED
+        this.velocity[0] = -PLAYER_SPEED
         this.directions['LEFT'] = true
         break
       }
       case 'UP': {
-        this.velocity[1] = -this.SPEED
+        this.velocity[1] = -PLAYER_SPEED
         this.directions['UP'] = true
         break
       }
       case 'DOWN': {
-        this.velocity[1] = this.SPEED
+        this.velocity[1] = PLAYER_SPEED
         this.directions['DOWN'] = true
         break
       }
@@ -50,22 +47,22 @@ export default class Player {
   unmove (direction) {
     switch (direction) {
       case 'RIGHT': {
-        this.velocity[0] = (this.directions['LEFT'] ? -this.SPEED : 0)
+        this.velocity[0] = (this.directions['LEFT'] ? -PLAYER_SPEED : 0)
         this.directions['RIGHT'] = false
         break
       }
       case 'LEFT': {
-        this.velocity[0] = (this.directions['RIGHT'] ? this.SPEED : 0)
+        this.velocity[0] = (this.directions['RIGHT'] ? PLAYER_SPEED : 0)
         this.directions['LEFT'] = false
         break
       }
       case 'UP': {
-        this.velocity[1] = (this.directions['DOWN'] ? this.SPEED : 0)
+        this.velocity[1] = (this.directions['DOWN'] ? PLAYER_SPEED : 0)
         this.directions['UP'] = false
         break
       }
       case 'DOWN': {
-        this.velocity[1] = (this.directions['UP'] ? -this.SPEED : 0)
+        this.velocity[1] = (this.directions['UP'] ? -PLAYER_SPEED : 0)
         this.directions['DOWN'] = false
         break
       }
@@ -73,7 +70,7 @@ export default class Player {
   }
 
   rotate (cursorX, cursorY) {
-    let cursorDiff = [cursorX - this.fakeCenterCoords[0], cursorY - this.fakeCenterCoords[1]]
+    let cursorDiff = [cursorX - CENTER[0], cursorY - CENTER[1]]
     this.rotation = Math.atan(cursorDiff[1] / cursorDiff[0]) + -1.5708
 
     if (cursorDiff[0] < 0) {
@@ -111,16 +108,31 @@ export default class Player {
   }
 
   shoot (cursorX, cursorY) {
+    let bulletSpriteManager = new SpriteManager(this.bulletSprite)
+    let offset = [
+      Math.cos(this.rotation) * this.bulletStartDiff,
+      Math.sin(this.rotation) * this.bulletStartDiff
+    ]
+    let difference = [
+      (cursorX - bulletSpriteManager.sprite.width / 2) - (CENTER[0] + offset[0]),
+      (cursorY - bulletSpriteManager.sprite.height / 2) - (CENTER[1] + offset[1])
+    ]
+    let scale = hypotenuse(difference) / BULLET_SPEED
+    let center = [
+      this.coords[0] + this.spriteManager.size[0] / 2,
+      this.coords[1] + this.spriteManager.size[1] / 2
+    ]
     let bullet = new Bullet(
       generateId(),
       this.rotation,
       [
-        this.coords[0] + this.spriteManager.size[0] / 2 + Math.cos(this.rotation) * this.bulletStartDiff >> 0,
-        this.coords[1] + this.spriteManager.size[1] / 2 + Math.sin(this.rotation) * this.bulletStartDiff >> 0
+        center[0] + offset[0] - bulletSpriteManager.size[0] / 2,
+        center[1] + offset[1] - bulletSpriteManager.size[1] / 2
       ],
-      new SpriteManager(this.bulletSprite)
+      [difference[0] / scale, difference[1] / scale],
+      bulletSpriteManager
     )
-    this.socket.emit('newBullet', bullet.id, bullet.coords, this.rotation)
+    this.socket.emit('newBullet', bullet.id, bullet.coords, this.rotation, bullet.velocity)
     this.bullets.push(bullet)
   }
 

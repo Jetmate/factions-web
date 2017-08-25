@@ -24,12 +24,14 @@ function main (ctx, grid, player, opponents, bullets) {
     // console.log(bullets[id])
     bullets[id].draw(ctx, player.generateDisplayCoords)
   }
-  player.drawBullets(ctx)
   for (let id in opponents) {
     opponents[id].draw(ctx, player.generateDisplayCoords)
   }
   player.draw(ctx)
   player.healthBar.draw(ctx)
+  // ctx.fillStyle = 'yellow'
+  // ctx.fillRect(player.fakeCoords[0], player.fakeCoords[1], player.spriteManager.size[0], player.spriteManager.size[1])
+  player.drawBullets(ctx)
 }
 
 function drawOutline (ctx, coordsFunc) {
@@ -89,7 +91,7 @@ function init (ctx, socket) {
     const spriteSheet = new SpriteSheet(spriteSheetImage)
     const playerSprite = spriteSheet.getSprite(12, 8, true)
     const bulletSprite = spriteSheet.getSprite(3, 4, true)
-    const bulletStart = [9 * SCALE_FACTOR, 5 * SCALE_FACTOR]
+    const bulletStart = [10.5 * SCALE_FACTOR, 5 * SCALE_FACTOR]
     let player = new Player(
       convertFromGrid(JSON.parse(window.coords)),
       new SpriteManager(playerSprite),
@@ -102,8 +104,8 @@ function init (ctx, socket) {
 
     socket.emit('new', window.id, player.coords)
 
-    socket.on('newBullet', (id, coords, rotation) => {
-      bullets[id] = new Bullet(id, rotation, coords, new SpriteManager(bulletSprite))
+    socket.on('newBullet', (id, coords, rotation, velocity) => {
+      bullets[id] = new Bullet(id, rotation, coords, velocity, new SpriteManager(bulletSprite))
     })
 
     socket.on('bulletCrash', (id) => {

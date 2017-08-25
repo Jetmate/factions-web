@@ -1,19 +1,19 @@
-import { findCenter } from './helpers.js'
+import { findCenter, hypotenuse } from './helpers.js'
 import { SCALE_FACTOR } from './constants.js'
 
 export default class SpriteManager {
   constructor (sprite) {
     this.sprite = sprite
-    this.size = [this.sprite.width * SCALE_FACTOR, this.sprite.height * SCALE_FACTOR]
     this.canvas = document.createElement('canvas')
 
-    this.diagonal = Math.sqrt(this.sprite.width ** 2 + this.sprite.height ** 2) >> 0
-    this.translation1 = this.diagonal / 2 >> 0
+    this.diagonal = hypotenuse([this.sprite.width, this.sprite.height])
+    this.translation1 = this.diagonal / 2
     let centerCoords = findCenter([this.diagonal, this.diagonal], [this.sprite.width, this.sprite.height])
-    this.translation2 = [-(this.translation1 - (centerCoords[0] >> 0)), -(this.translation1 - (centerCoords[1] >> 0))]
+    this.translation2 = [-(this.translation1 - centerCoords[0]), -(this.translation1 - centerCoords[1])]
 
     this.canvas.width = this.diagonal * SCALE_FACTOR
     this.canvas.height = this.canvas.width
+    this.size = [this.canvas.width, this.canvas.height]
     this.ctx = this.canvas.getContext('2d')
     this.ctx.imageSmoothingEnabled = false
     this.rotate(0)

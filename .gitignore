@@ -56,3 +56,9 @@ typings/
 
 # dotenv environment variables file
 .env
+
+# Webpack build result
+bundle.js
+
+# Gulp build result
+main.js
