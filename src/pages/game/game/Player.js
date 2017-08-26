@@ -8,6 +8,8 @@ export default class Player {
     this.spriteManager = spriteManager
     this.coords = findCenter([BLOCK_WIDTH, BLOCK_WIDTH], this.spriteManager.size, coords)
     this.fakeCoords = findCenter([CANVAS_WIDTH, CANVAS_HEIGHT], this.spriteManager.size)
+    this.fakeCoords[0] = this.fakeCoords[0] >> 0
+    this.fakeCoords[1] = this.fakeCoords[1] >> 0
     this.velocity = [0, 0]
     this.rotation = 0
     this.directions = {'RIGHT': false, 'LEFT': false, 'UP': false, 'DOWN': false}
@@ -86,8 +88,8 @@ export default class Player {
 
   generateDisplayCoords = (coords) => {
     return [
-      coords[0] + this.fakeCoords[0] - this.coords[0],
-      coords[1] + this.fakeCoords[1] - this.coords[1]
+      coords[0] + this.fakeCoords[0] - this.coords[0] >> 0,
+      coords[1] + this.fakeCoords[1] - this.coords[1] >> 0
     ]
   }
 
