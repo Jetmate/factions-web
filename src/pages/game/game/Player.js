@@ -1,10 +1,10 @@
-import { findCenter, withinBounds, generateId, checkCollision, hypotenuse, findAllGridCoords, convertFromGrid, opposite } from './helpers.js'
+import { findCenter, generateId, checkCollision, hypotenuse, findAllGridCoords, convertFromGrid } from './helpers.js'
 import { BLOCK_SIZE, CANVAS_WIDTH, CANVAS_HEIGHT, CENTER, BULLET_SPEED, PLAYER_SPEED } from './constants.js'
 import Bullet from './Bullet.js'
 import SpriteManager from './SpriteManager.js'
 
 export default class Player {
-  constructor (coords, spriteManager, socket, bulletSprite, bulletStart, healthBar, health) {
+  constructor (coords, spriteManager, socket, bulletSprite, bulletStart, healthBar, miniMap, health) {
     this.spriteManager = spriteManager
     this.coords = findCenter(BLOCK_SIZE, this.spriteManager.size, coords)
     this.fakeCoords = findCenter([CANVAS_WIDTH, CANVAS_HEIGHT], this.spriteManager.size)
@@ -18,6 +18,7 @@ export default class Player {
     this.bullets = []
     this.bulletStartDiff = hypotenuse([bulletStart[0] - this.spriteManager.size[0] / 2, bulletStart[1] - this.spriteManager.size[1] / 2])
     this.healthBar = healthBar
+    this.miniMap = miniMap
     this.health = this.initialHealth = health
   }
 
@@ -182,7 +183,6 @@ export default class Player {
       let crashed = false
       for (let [x, y] of allGridCoords) {
         if (grid.grid[x][y] === 'block') {
-
           this.socket.emit('bulletCrash', this.bullets[i].id)
           crashedBullets.push(i)
           crashed = true
@@ -193,7 +193,6 @@ export default class Player {
       if (!crashed) {
         for (let id in players) {
           if (checkCollision(players[id].coords, players[id].spriteManager.size, this.bullets[i].coords, this.bullets[i].spriteManager.size)) {
-
             this.socket.emit('bulletHit', this.bullets[i].id, id)
             crashedBullets.push(i)
             break

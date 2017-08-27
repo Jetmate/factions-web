@@ -1,9 +1,8 @@
+import { HEALTH_BAR_SIZE, HEALTH_BAR_COORDS, HEALTH_BAR_COLOR } from './constants.js'
+
 export default class HealthBar {
-  constructor (coords, size, color) {
-    this.coords = coords
-    this.initialSize = size
-    this.height = this.initialSize[1]
-    this.color = color
+  constructor () {
+    this.height = HEALTH_BAR_SIZE[1]
   }
 
   changeHealth (percentage) {
@@ -11,7 +10,7 @@ export default class HealthBar {
   }
 
   draw (ctx) {
-    ctx.fillStyle = this.color
-    ctx.fillRect(this.coords[0], this.coords[1], this.initialSize[0], this.height)
+    ctx.fillStyle = HEALTH_BAR_COLOR
+    ctx.fillRect(HEALTH_BAR_COORDS[0], HEALTH_BAR_COORDS[1], HEALTH_BAR_SIZE[0], this.height)
   }
 }

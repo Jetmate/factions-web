@@ -4,10 +4,11 @@ import Player from './Player.js'
 import Opponent from './Opponent.js'
 import Bullet from './Bullet.js'
 import HealthBar from './HealthBar.js'
+import MiniMap from './MiniMap.js'
 import Grid from './Grid.js'
 
 import { convertFromGrid } from './helpers.js'
-import { SCALE_FACTOR, CANVAS_WIDTH, CANVAS_HEIGHT, UPDATE_WAIT, KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN, HEALTH_BAR_COORDS, HEALTH_BAR_SIZE, HEALTH_BAR_COLOR } from './constants.js'
+import { SCALE_FACTOR, CANVAS_WIDTH, CANVAS_HEIGHT, UPDATE_WAIT, KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN, PLAYER_HEALTH } from './constants.js'
 
 function main (ctx, grid, player, opponents, bullets) {
   player.execute(grid)
@@ -24,14 +25,15 @@ function main (ctx, grid, player, opponents, bullets) {
     // console.log(bullets[id])
     bullets[id].draw(ctx, player.generateDisplayCoords)
   }
+  player.drawBullets(ctx)
   for (let id in opponents) {
     opponents[id].draw(ctx, player.generateDisplayCoords)
   }
   player.draw(ctx)
   player.healthBar.draw(ctx)
+  player.miniMap.draw(ctx, [player.coords[0] / grid.canvas.width, player.coords[1] / grid.canvas.height])
   // ctx.fillStyle = 'yellow'
   // ctx.fillRect(player.fakeCoords[0], player.fakeCoords[1], player.spriteManager.size[0], player.spriteManager.size[1])
-  player.drawBullets(ctx)
 }
 
 let ctx, socket
@@ -66,8 +68,9 @@ function init (ctx, socket) {
       socket,
       bulletSprite,
       bulletStart,
-      new HealthBar(HEALTH_BAR_COORDS, HEALTH_BAR_SIZE, HEALTH_BAR_COLOR),
-      10
+      new HealthBar(),
+      new MiniMap(),
+      PLAYER_HEALTH
     )
 
     socket.emit('new', window.id, player.coords)
