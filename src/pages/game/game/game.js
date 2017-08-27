@@ -4,12 +4,13 @@ import Player from './Player.js'
 import Opponent from './Opponent.js'
 import Bullet from './Bullet.js'
 import HealthBar from './HealthBar.js'
+import Grid from './Grid.js'
 
 import { convertFromGrid } from './helpers.js'
-import { SCALE_FACTOR, GRID_WIDTH, GRID_HEIGHT, BLOCK_WIDTH, WIDTH, HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT, UPDATE_WAIT, KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN, GRID_COLOR, HEALTH_BAR_COORDS, HEALTH_BAR_SIZE, HEALTH_BAR_COLOR } from './constants.js'
+import { SCALE_FACTOR, CANVAS_WIDTH, CANVAS_HEIGHT, UPDATE_WAIT, KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN, HEALTH_BAR_COORDS, HEALTH_BAR_SIZE, HEALTH_BAR_COLOR } from './constants.js'
 
 function main (ctx, grid, player, opponents, bullets) {
-  player.execute(grid)
+  player.execute()
   player.moveBullets(opponents)
 
   for (let id in bullets) {
@@ -17,8 +18,7 @@ function main (ctx, grid, player, opponents, bullets) {
   }
 
   ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-  drawOutline(ctx, player.generateDisplayCoords)
-  drawGrid(ctx, grid, player.generateDisplayCoords)
+  grid.draw(ctx, player.generateDisplayCoords)
   for (let id in bullets) {
     // console.log(id)
     // console.log(bullets[id])
@@ -32,36 +32,6 @@ function main (ctx, grid, player, opponents, bullets) {
   // ctx.fillStyle = 'yellow'
   // ctx.fillRect(player.fakeCoords[0], player.fakeCoords[1], player.spriteManager.size[0], player.spriteManager.size[1])
   player.drawBullets(ctx)
-}
-
-function drawOutline (ctx, coordsFunc) {
-  ctx.beginPath()
-  ctx.strokeStyle = GRID_COLOR
-  let begin, end
-  for (let x = 0; x <= GRID_WIDTH; x++) {
-    begin = coordsFunc([x * BLOCK_WIDTH, 0])
-    end = coordsFunc([x * BLOCK_WIDTH, HEIGHT])
-    // console.log('begin', begin, 'end', end)
-    ctx.moveTo(begin[0], begin[1])
-    ctx.lineTo(end[0], end[1])
-  }
-  for (let y = 0; y <= GRID_HEIGHT; y++) {
-    begin = coordsFunc([0, y * BLOCK_WIDTH])
-    end = coordsFunc([WIDTH, y * BLOCK_WIDTH])
-    ctx.moveTo(begin[0], begin[1])
-    ctx.lineTo(end[0], end[1])
-  }
-  ctx.stroke()
-}
-
-function drawGrid (ctx, grid, coordsFunc) {
-  for (let x = 0; x < GRID_WIDTH; x++) {
-    for (let y = 0; y < GRID_HEIGHT; y++) {
-      if (grid[x][y]) {
-        // ctx.drawImage(this.sprites[grid[x][y]], coordsFunc(convertFromGrid([x, y])))
-      }
-    }
-  }
 }
 
 let ctx, socket
@@ -80,10 +50,6 @@ document.addEventListener('finishCanvasInit', (event) => {
 })
 
 function init (ctx, socket) {
-  let grid = JSON.parse(window.grid)
-  let opponents = []
-  let bullets = {}
-
   const spriteSheetImage = new Image()
   spriteSheetImage.src = 'media/spritesheet.png'
 
@@ -91,6 +57,8 @@ function init (ctx, socket) {
     const spriteSheet = new SpriteSheet(spriteSheetImage)
     const playerSprite = spriteSheet.getSprite(12, 8, true)
     const bulletSprite = spriteSheet.getSprite(3, 4, true)
+    const blockSprite = spriteSheet.getSprite(16, 16, true)
+
     const bulletStart = [10.5 * SCALE_FACTOR, 5 * SCALE_FACTOR]
     let player = new Player(
       convertFromGrid(JSON.parse(window.coords)),
@@ -103,6 +71,12 @@ function init (ctx, socket) {
     )
 
     socket.emit('new', window.id, player.coords)
+
+
+    let grid = new Grid(JSON.parse(window.grid), blockSprite)
+    let opponents = []
+    let bullets = {}
+
 
     socket.on('newBullet', (id, coords, rotation, velocity) => {
       bullets[id] = new Bullet(id, rotation, coords, velocity, new SpriteManager(bulletSprite))

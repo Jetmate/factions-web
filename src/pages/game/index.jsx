@@ -1,6 +1,6 @@
 import React from 'react'
 
-import Game from './component/game.jsx'
+import Game from './game/game.jsx'
 import io from 'socket.io-client'
 
 

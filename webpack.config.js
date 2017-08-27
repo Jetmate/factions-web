@@ -27,7 +27,7 @@ module.exports = {
           {
             loader: 'css-loader',
             query: {
-              modules: true,
+              modules: true
             }
           },
           {
@@ -45,11 +45,11 @@ module.exports = {
         include: APP_DIR,
         loader: 'babel-loader',
         options: {
-          'presets' : ['es2015', 'stage-0', 'react']
+          'presets': ['env', 'stage-0', 'react']
         }
       },
-      { 
-        test: /\.(png|woff|woff2|eot|ttf|otf|svg)$/, 
+      {
+        test: /\.(png|woff|woff2|eot|ttf|otf|svg)$/,
         loader: 'url-loader',
         options: {
           limit: 100000

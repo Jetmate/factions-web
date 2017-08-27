@@ -93,7 +93,7 @@ export default class Player {
     ]
   }
 
-  execute (grid, socket) {
+  execute () {
     let oldCoords = this.coords.slice()
     for (let i = 0; i < 2; i++) {
       if (this.velocity[i]) {
