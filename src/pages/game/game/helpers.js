@@ -72,11 +72,18 @@ export function generateId (length = 5) {
   return result.join('')
 }
 
-export function checkCollision (thing1, thing2) {
-  return (thing1.coords[0] < thing2.coords[0] + thing2.spriteManager.size[0]) &&
-         (thing2.coords[0] < thing1.coords[0] + thing1.spriteManager.size[0]) &&
-         (thing1.coords[1] < thing2.coords[1] + thing2.spriteManager.size[1]) &&
-         (thing2.coords[1] < thing1.coords[1] + thing1.spriteManager.size[1])
+// export function checkCollision (thing1, thing2) {
+//   return (thing1.coords[0] < thing2.coords[0] + thing2.spriteManager.size[0]) &&
+//          (thing2.coords[0] < thing1.coords[0] + thing1.spriteManager.size[0]) &&
+//          (thing1.coords[1] < thing2.coords[1] + thing2.spriteManager.size[1]) &&
+//          (thing2.coords[1] < thing1.coords[1] + thing1.spriteManager.size[1])
+// }
+
+export function checkCollision (coords1, size1, coords2, size2) {
+  return (coords1[0] < coords2[0] + size2[0]) &&
+         (coords2[0] < coords1[0] + size1[0]) &&
+         (coords1[1] < coords2[1] + size2[1]) &&
+         (coords2[1] < coords1[1] + size1[1])
 }
 
 export function hypotenuse (coords) {

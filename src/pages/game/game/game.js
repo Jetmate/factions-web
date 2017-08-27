@@ -10,8 +10,8 @@ import { convertFromGrid } from './helpers.js'
 import { SCALE_FACTOR, CANVAS_WIDTH, CANVAS_HEIGHT, UPDATE_WAIT, KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN, HEALTH_BAR_COORDS, HEALTH_BAR_SIZE, HEALTH_BAR_COLOR } from './constants.js'
 
 function main (ctx, grid, player, opponents, bullets) {
-  player.execute()
-  player.moveBullets(opponents)
+  player.execute(grid)
+  player.moveBullets(grid, opponents)
 
   for (let id in bullets) {
     bullets[id].move()

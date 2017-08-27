@@ -1,16 +1,16 @@
-import { findCenter, withinBounds, generateId, checkCollision, hypotenuse } from './helpers.js'
-import { BLOCK_WIDTH, CANVAS_WIDTH, CANVAS_HEIGHT, CENTER, BULLET_SPEED, PLAYER_SPEED } from './constants.js'
+import { findCenter, withinBounds, generateId, checkCollision, hypotenuse, findAllGridCoords, convertFromGrid, opposite } from './helpers.js'
+import { BLOCK_SIZE, CANVAS_WIDTH, CANVAS_HEIGHT, CENTER, BULLET_SPEED, PLAYER_SPEED } from './constants.js'
 import Bullet from './Bullet.js'
 import SpriteManager from './SpriteManager.js'
 
 export default class Player {
   constructor (coords, spriteManager, socket, bulletSprite, bulletStart, healthBar, health) {
     this.spriteManager = spriteManager
-    this.coords = findCenter([BLOCK_WIDTH, BLOCK_WIDTH], this.spriteManager.size, coords)
+    this.coords = findCenter(BLOCK_SIZE, this.spriteManager.size, coords)
     this.fakeCoords = findCenter([CANVAS_WIDTH, CANVAS_HEIGHT], this.spriteManager.size)
     this.fakeCoords[0] = this.fakeCoords[0] >> 0
     this.fakeCoords[1] = this.fakeCoords[1] >> 0
-    this.velocity = [0, 0]
+    this.movement = [0, 0]
     this.rotation = 0
     this.directions = {'RIGHT': false, 'LEFT': false, 'UP': false, 'DOWN': false}
     this.socket = socket
@@ -24,22 +24,22 @@ export default class Player {
   move (direction) {
     switch (direction) {
       case 'RIGHT': {
-        this.velocity[0] = PLAYER_SPEED
+        this.movement[0] = PLAYER_SPEED
         this.directions['RIGHT'] = true
         break
       }
       case 'LEFT': {
-        this.velocity[0] = -PLAYER_SPEED
+        this.movement[0] = -PLAYER_SPEED
         this.directions['LEFT'] = true
         break
       }
       case 'UP': {
-        this.velocity[1] = -PLAYER_SPEED
+        this.movement[1] = -PLAYER_SPEED
         this.directions['UP'] = true
         break
       }
       case 'DOWN': {
-        this.velocity[1] = PLAYER_SPEED
+        this.movement[1] = PLAYER_SPEED
         this.directions['DOWN'] = true
         break
       }
@@ -49,22 +49,22 @@ export default class Player {
   unmove (direction) {
     switch (direction) {
       case 'RIGHT': {
-        this.velocity[0] = (this.directions['LEFT'] ? -PLAYER_SPEED : 0)
+        this.movement[0] = (this.directions['LEFT'] ? -PLAYER_SPEED : 0)
         this.directions['RIGHT'] = false
         break
       }
       case 'LEFT': {
-        this.velocity[0] = (this.directions['RIGHT'] ? PLAYER_SPEED : 0)
+        this.movement[0] = (this.directions['RIGHT'] ? PLAYER_SPEED : 0)
         this.directions['LEFT'] = false
         break
       }
       case 'UP': {
-        this.velocity[1] = (this.directions['DOWN'] ? PLAYER_SPEED : 0)
+        this.movement[1] = (this.directions['DOWN'] ? PLAYER_SPEED : 0)
         this.directions['UP'] = false
         break
       }
       case 'DOWN': {
-        this.velocity[1] = (this.directions['UP'] ? -PLAYER_SPEED : 0)
+        this.movement[1] = (this.directions['UP'] ? -PLAYER_SPEED : 0)
         this.directions['DOWN'] = false
         break
       }
@@ -93,18 +93,53 @@ export default class Player {
     ]
   }
 
-  execute () {
-    let oldCoords = this.coords.slice()
+  processCollision (coords, size) {
     for (let i = 0; i < 2; i++) {
-      if (this.velocity[i]) {
+      if (this.velocity[i] !== 0) {
         let newCoords = this.coords.slice()
         newCoords[i] += this.velocity[i]
-        if (withinBounds(newCoords, this.spriteManager.size)) {
-          this.coords[i] = newCoords[i]
+        if (checkCollision(newCoords, this.spriteManager.size, coords, size)) {
+          this.alignVelocity(coords, size, i)
         }
       }
     }
-    if (this.coords[0] !== oldCoords[0] || this.coords[1] !== oldCoords[1]) {
+  }
+
+  alignVelocity (coords, size, i) {
+    if (this.velocity[i] > 0) {
+      this.velocity[i] = coords[i] - (this.coords[i] + this.spriteManager.size[i])
+    } else {
+      this.velocity[i] = (coords[i] + size[i]) - this.coords[i]
+    }
+  }
+
+  execute (grid) {
+    this.velocity = this.movement.slice()
+    if (this.velocity[0] === 0 && this.velocity[1] === 0) {
+      return
+    }
+
+    let allGridCoords = findAllGridCoords([this.coords[0] + this.velocity[0], this.coords[1] + this.velocity[1]], this.spriteManager.size)
+
+    let collided = []
+    for (let [x, y] of allGridCoords) {
+      if (grid.grid[x][y] === 'block') {
+        this.processCollision(convertFromGrid([x, y]), BLOCK_SIZE)
+        collided.push(convertFromGrid([x, y]))
+      }
+    }
+
+    if (!(this.velocity[0] === 0 && this.velocity[1] === 0)) {
+      this.coords[0] += this.velocity[0]
+      this.coords[1] += this.velocity[1]
+
+      if (this.velocity[0] && this.velocity[1] && collided.length === 1) {
+        if (checkCollision(this.coords, this.spriteManager.size, collided[0], BLOCK_SIZE)) {
+          this.alignVelocity(collided[0], BLOCK_SIZE, 0)
+          this.coords[0] += this.velocity[0]
+        }
+      }
+
       this.socket.emit('playerChange', window.id, 'coords', this.coords)
     }
   }
@@ -138,19 +173,27 @@ export default class Player {
     this.bullets.push(bullet)
   }
 
-  moveBullets (players) {
+  moveBullets (grid, players) {
     let crashedBullets = []
     for (let i = 0; i < this.bullets.length; i++) {
       this.bullets[i].move()
-      // console.log(this.bullets[i].coords)
-      if (!withinBounds(this.bullets[i].coords, this.bullets[i].spriteManager.size)) {
-        this.socket.emit('bulletCrash', this.bullets[i].id)
-        crashedBullets.push(i)
-      } else {
+
+      let allGridCoords = findAllGridCoords(this.bullets[i].coords, this.bullets[i].spriteManager.size)
+      let crashed = false
+      for (let [x, y] of allGridCoords) {
+        if (grid.grid[x][y] === 'block') {
+
+          this.socket.emit('bulletCrash', this.bullets[i].id)
+          crashedBullets.push(i)
+          crashed = true
+          break
+        }
+      }
+
+      if (!crashed) {
         for (let id in players) {
-          // console.log(checkCollision(players[id], this.bullets[i]))
-          if (checkCollision(players[id], this.bullets[i])) {
-            // console.log(id)
+          if (checkCollision(players[id].coords, players[id].spriteManager.size, this.bullets[i].coords, this.bullets[i].spriteManager.size)) {
+
             this.socket.emit('bulletHit', this.bullets[i].id, id)
             crashedBullets.push(i)
             break
@@ -158,6 +201,7 @@ export default class Player {
         }
       }
     }
+
     for (let i = 0; i < crashedBullets.length; i++) {
       this.bullets.splice(crashedBullets[i], 1)
     }

@@ -45,7 +45,7 @@ export default class Grid {
 
   draw (ctx, coordsFunc) {
     let [x, y] = coordsFunc([0, 0])
-    console.log(x, y)
+    // console.log(x, y)
     ctx.drawImage(this.canvas, x, y)
   }
 }
