@@ -1,22 +1,22 @@
 {
-  "name": "fire-arcade",
+  "name": "factions.io",
   "version": "1.0.0",
-  "description": "An arcade that specializes in real-time multiplayer games",
-  "main": "index.js",
+  "description": "An awesome io game with a focus on survival and teamwork",
+  "main": "www/index.html",
   "scripts": {
     "test": "webpack --watch --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@gitlab.com/Jetmate/FireArcade.git"
+    "url": "git+ssh://git@gitlab.com/Jetmate/factions.git"
   },
   "author": "Anton Outkine",
   "license": "ISC",
   "bugs": {
-    "url": "https://gitlab.com/Jetmate/FireArcade/issues"
+    "url": "https://gitlab.com/Jetmate/factions/issues"
   },
-  "homepage": "https://gitlab.com/Jetmate/FireArcade#README",
+  "homepage": "https://gitlab.com/Jetmate/factions#README",
   "devDependencies": {
     "autoprefixer": "^7.1.1",
     "babel-loader": "^7.1.1",
