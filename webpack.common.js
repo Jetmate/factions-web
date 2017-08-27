@@ -11,11 +11,6 @@ module.exports = {
     filename: 'bundle.js'
   },
 
-  devServer: {
-    hot: true,
-    contentBase: BUILD_DIR
-  },
-
   module: {
     rules: [
       {

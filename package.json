@@ -4,8 +4,8 @@
   "description": "An arcade that specializes in real-time multiplayer games",
   "main": "index.js",
   "scripts": {
-    "test": "webpack-dev-server --inline --hot",
-    "build": "webpack --watch"
+    "test": "webpack --watch --config webpack.dev.js",
+    "build": "webpack --config webpack.prod.js"
   },
   "repository": {
     "type": "git",
@@ -18,9 +18,6 @@
   },
   "homepage": "https://gitlab.com/Jetmate/FireArcade#README",
   "devDependencies": {
-    "react": "^15.6.1",
-    "react-dom": "^15.6.1",
-    "socket.io-client": "^2.0.3",
     "autoprefixer": "^7.1.1",
     "babel-loader": "^7.1.1",
     "babel-preset-env": "^1.6.0",
@@ -29,9 +26,14 @@
     "css-loader": "^0.28.4",
     "file-loader": "^0.11.2",
     "postcss-loader": "^2.0.6",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "socket.io-client": "^2.0.3",
     "style-loader": "^0.18.2",
+    "uglifyjs-webpack-plugin": "^0.4.6",
     "url-loader": "^0.5.9",
     "webpack": "^3.0.0",
-    "webpack-dev-server": "^2.5.0"
+    "webpack-dev-server": "^2.5.0",
+    "webpack-merge": "^4.1.0"
   }
 }
