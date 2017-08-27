@@ -1,4 +1,4 @@
-import { BLOCK_WIDTH, SCALE_FACTOR } from './constants.js'
+import { BLOCK_WIDTH, SCALE_FACTOR, GRID_COLOR } from './constants.js'
 
 export default class Grid {
   constructor (grid, blockSprite) {
@@ -17,7 +17,7 @@ export default class Grid {
 
   generateSprite () {
     this.ctx.beginPath()
-    this.ctx.strokeStyle = 'black'
+    this.ctx.strokeStyle = GRID_COLOR
     let begin, end
     for (let x = 0; x <= this.width; x++) {
       begin = [x * 16, 0]
