@@ -1,10 +1,12 @@
 import { findCenter, generateId, checkCollision, hypotenuse, findAllGridCoords, convertFromGrid } from './helpers.js'
-import { BLOCK_SIZE, CANVAS_WIDTH, CANVAS_HEIGHT, CENTER, BULLET_SPEED, PLAYER_SPEED } from './constants.js'
+import { BLOCK_SIZE, CANVAS_WIDTH, CANVAS_HEIGHT, CENTER, BULLET_SPEED, PLAYER_SPEED, HEALTH_BAR_COORDS, HEALTH_BAR_SIZE } from './constants.js'
 import Bullet from './Bullet.js'
 import SpriteManager from './SpriteManager.js'
+import HealthBar from './HealthBar.js'
+import MiniMap from './MiniMap.js'
 
 export default class Player {
-  constructor (coords, spriteManager, socket, bulletSprite, bulletStart, healthBar, miniMap, health) {
+  constructor (coords, spriteManager, socket, bulletSprite, bulletStart, health) {
     this.spriteManager = spriteManager
     this.coords = findCenter(BLOCK_SIZE, this.spriteManager.size, coords)
     this.fakeCoords = findCenter([CANVAS_WIDTH, CANVAS_HEIGHT], this.spriteManager.size)
@@ -17,8 +19,8 @@ export default class Player {
     this.bulletSprite = bulletSprite
     this.bullets = []
     this.bulletStartDiff = hypotenuse([bulletStart[0] - this.spriteManager.size[0] / 2, bulletStart[1] - this.spriteManager.size[1] / 2])
-    this.healthBar = healthBar
-    this.miniMap = miniMap
+    this.healthBar = new HealthBar(HEALTH_BAR_SIZE, 1)
+    this.miniMap = new MiniMap()
     this.health = this.initialHealth = health
   }
 
@@ -83,8 +85,10 @@ export default class Player {
     this.socket.emit('playerChange', window.id, 'rotation', this.rotation)
   }
 
-  draw (ctx) {
+  draw (ctx, grid) {
     ctx.drawImage(this.spriteManager.currentSprite(), this.fakeCoords[0], this.fakeCoords[1])
+    this.healthBar.draw(ctx, HEALTH_BAR_COORDS)
+    this.miniMap.draw(ctx, [this.coords[0] / grid.canvas.width, this.coords[1] / grid.canvas.height])
   }
 
   generateDisplayCoords = (coords) => {
@@ -194,6 +198,7 @@ export default class Player {
         for (let id in players) {
           if (checkCollision(players[id].coords, players[id].spriteManager.size, this.bullets[i].coords, this.bullets[i].spriteManager.size)) {
             this.socket.emit('bulletHit', this.bullets[i].id, id)
+            players[id].takeDamage()
             crashedBullets.push(i)
             break
           }

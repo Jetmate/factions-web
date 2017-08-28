@@ -3,8 +3,6 @@ import SpriteManager from './SpriteManager.js'
 import Player from './Player.js'
 import Opponent from './Opponent.js'
 import Bullet from './Bullet.js'
-import HealthBar from './HealthBar.js'
-import MiniMap from './MiniMap.js'
 import Grid from './Grid.js'
 
 import { convertFromGrid } from './helpers.js'
@@ -30,9 +28,7 @@ function main (ctx, grid, player, opponents, bullets) {
   for (let id in opponents) {
     opponents[id].draw(ctx, player.generateDisplayCoords)
   }
-  player.draw(ctx)
-  player.healthBar.draw(ctx)
-  player.miniMap.draw(ctx, [player.coords[0] / grid.canvas.width, player.coords[1] / grid.canvas.height])
+  player.draw(ctx, grid)
   // ctx.fillStyle = 'yellow'
   // ctx.fillRect(player.fakeCoords[0], player.fakeCoords[1], player.spriteManager.size[0], player.spriteManager.size[1])
 }
@@ -69,8 +65,6 @@ function init (ctx, socket) {
       socket,
       bulletSprite,
       bulletStart,
-      new HealthBar(),
-      new MiniMap(),
       PLAYER_HEALTH
     )
 
@@ -78,7 +72,7 @@ function init (ctx, socket) {
 
 
     let grid = new Grid(JSON.parse(window.grid), blockSprite)
-    let opponents = []
+    let opponents = {}
     let bullets = {}
 
 
@@ -91,15 +85,17 @@ function init (ctx, socket) {
     })
 
     socket.on('bulletHit', (id, playerId) => {
-      console.log('HIT')
+      // console.log('HIT')
       delete bullets[id]
       if (playerId === window.id) {
         player.takeDamage()
+      } else if (playerId in opponents) {
+        opponents[playerId].takeDamage()
       }
     })
 
-    socket.on('player', (id, coords) => {
-      opponents[id] = new Opponent(coords, new SpriteManager(playerSprite))
+    socket.on('player', (id, coords, health) => {
+      opponents[id] = new Opponent(coords, new SpriteManager(playerSprite), health)
       console.log('RECEIVED PLAYER:', id)
       console.log('OPPONENTS', opponents)
     })
@@ -113,10 +109,12 @@ function init (ctx, socket) {
 
 
     socket.on('new', (id, coords) => {
-      opponents[id] = new Opponent(coords, new SpriteManager(playerSprite))
+      opponents[id] = new Opponent(coords, new SpriteManager(playerSprite), PLAYER_HEALTH)
       console.log('NEW PLAYER:', id)
       console.log('OPPONENTS', opponents)
-      socket.emit('player', window.id, player.coords)
+      if (player.health > 0) {
+        socket.emit('player', window.id, player.coords, player.health)
+      }
     })
 
 
@@ -130,6 +128,7 @@ function init (ctx, socket) {
       // console.log('OPPONENTS', opponents)
       // console.log('ACTION:', id)
       // console.log('CHANGE', type, value)
+      // console.log(opponents)
       if (id in opponents) {
         opponents[id].processChange(type, value)
       }
