@@ -1,4 +1,4 @@
-import { BLOCK_WIDTH, SCALE_FACTOR, GRID_COLOR } from './constants.js'
+import { BLOCK_WIDTH, REAL_BLOCK_WIDTH, SCALE_FACTOR, GRID_COLOR, BLOCK_OUTLINE_COLOR, BLOCK_COLOR, BLOCK_OUTLINE_WIDTH, FLOOR_COLOR } from './constants.js'
 
 export default class Grid {
   constructor (grid, blockSprite) {
@@ -10,6 +10,8 @@ export default class Grid {
     this.canvas.height = this.height * BLOCK_WIDTH
     this.ctx = this.canvas.getContext('2d')
     this.ctx.imageSmoothingEnabled = false
+    this.ctx.webkitImageSmoothingEnabled = false
+    this.ctx.mozImageSmoothingEnabled = false
     this.ctx.scale(SCALE_FACTOR, SCALE_FACTOR)
     this.blockSprite = blockSprite
     this.generateSprite()
@@ -20,24 +22,61 @@ export default class Grid {
     this.ctx.strokeStyle = GRID_COLOR
     let begin, end
     for (let x = 0; x <= this.width; x++) {
-      begin = [x * 16, 0]
-      end = [x * 16, this.canvas.height]
+      begin = [x * REAL_BLOCK_WIDTH, 0]
+      end = [x * REAL_BLOCK_WIDTH, this.canvas.height]
       // console.log('begin', begin, 'end', end)
       this.ctx.moveTo(begin[0], begin[1])
       this.ctx.lineTo(end[0], end[1])
     }
     for (let y = 0; y <= this.height; y++) {
-      begin = [0, y * 16]
-      end = [this.canvas.width, y * 16]
+      begin = [0, y * REAL_BLOCK_WIDTH]
+      end = [this.canvas.width, y * REAL_BLOCK_WIDTH]
       this.ctx.moveTo(begin[0], begin[1])
       this.ctx.lineTo(end[0], end[1])
     }
     this.ctx.stroke()
 
+
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
         if (this.grid[x][y] === 'block') {
-          this.ctx.drawImage(this.blockSprite, x * 16, y * 16)
+          this.ctx.fillStyle = BLOCK_COLOR
+          this.ctx.fillRect(x * REAL_BLOCK_WIDTH, y * REAL_BLOCK_WIDTH, REAL_BLOCK_WIDTH, REAL_BLOCK_WIDTH)
+
+          this.ctx.fillStyle = BLOCK_OUTLINE_COLOR
+          if (this.grid[x - 1] && this.grid[x - 1][y] === '') {
+            this.ctx.fillRect(x * REAL_BLOCK_WIDTH, y * REAL_BLOCK_WIDTH, BLOCK_OUTLINE_WIDTH, REAL_BLOCK_WIDTH)
+          }
+          if (this.grid[x + 1] && this.grid[x + 1][y] === '') {
+            this.ctx.fillRect(x * REAL_BLOCK_WIDTH + (REAL_BLOCK_WIDTH - BLOCK_OUTLINE_WIDTH), y * REAL_BLOCK_WIDTH, BLOCK_OUTLINE_WIDTH, REAL_BLOCK_WIDTH)
+          }
+          if (this.grid[x][y - 1] === '') {
+            this.ctx.fillRect(x * REAL_BLOCK_WIDTH, y * REAL_BLOCK_WIDTH, REAL_BLOCK_WIDTH, BLOCK_OUTLINE_WIDTH)
+          }
+          if (this.grid[x][y + 1] === '') {
+            this.ctx.fillRect(x * REAL_BLOCK_WIDTH, y * REAL_BLOCK_WIDTH + (REAL_BLOCK_WIDTH - BLOCK_OUTLINE_WIDTH), REAL_BLOCK_WIDTH, BLOCK_OUTLINE_WIDTH)
+          }
+
+          this.ctx.fillStyle = FLOOR_COLOR
+          if (this.grid[x - 1] && this.grid[x - 1][y] === '') {
+            if (this.grid[x][y - 1] === '') {
+              this.ctx.fillRect(x * REAL_BLOCK_WIDTH, y * REAL_BLOCK_WIDTH, BLOCK_OUTLINE_WIDTH, BLOCK_OUTLINE_WIDTH)
+            }
+            if (this.grid[x][y + 1] === '') {
+              this.ctx.fillRect(x * REAL_BLOCK_WIDTH, y * REAL_BLOCK_WIDTH + (REAL_BLOCK_WIDTH - BLOCK_OUTLINE_WIDTH), BLOCK_OUTLINE_WIDTH, BLOCK_OUTLINE_WIDTH)
+            }
+          }
+          if (this.grid[x + 1] && this.grid[x + 1][y] === '') {
+            if (this.grid[x][y - 1] === '') {
+              this.ctx.fillRect(x * REAL_BLOCK_WIDTH + (REAL_BLOCK_WIDTH - BLOCK_OUTLINE_WIDTH), y * REAL_BLOCK_WIDTH, BLOCK_OUTLINE_WIDTH, BLOCK_OUTLINE_WIDTH)
+            }
+            if (this.grid[x][y + 1] === '') {
+              this.ctx.fillRect(x * REAL_BLOCK_WIDTH + (REAL_BLOCK_WIDTH - BLOCK_OUTLINE_WIDTH), y * REAL_BLOCK_WIDTH + (REAL_BLOCK_WIDTH - BLOCK_OUTLINE_WIDTH), BLOCK_OUTLINE_WIDTH, BLOCK_OUTLINE_WIDTH)
+            }
+          }
+        } else {
+          this.ctx.fillStyle = FLOOR_COLOR
+          this.ctx.fillRect(x * REAL_BLOCK_WIDTH, y * REAL_BLOCK_WIDTH, REAL_BLOCK_WIDTH, REAL_BLOCK_WIDTH)
         }
       }
     }
@@ -45,7 +84,6 @@ export default class Grid {
 
   draw (ctx, coordsFunc) {
     let [x, y] = coordsFunc([0, 0])
-    console.log(x, y)
     ctx.drawImage(this.canvas, x, y)
   }
 }

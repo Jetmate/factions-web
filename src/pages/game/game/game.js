@@ -8,7 +8,7 @@ import MiniMap from './MiniMap.js'
 import Grid from './Grid.js'
 
 import { convertFromGrid } from './helpers.js'
-import { SCALE_FACTOR, CANVAS_WIDTH, CANVAS_HEIGHT, UPDATE_WAIT, KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN, PLAYER_HEALTH } from './constants.js'
+import { SCALE_FACTOR, CANVAS_WIDTH, CANVAS_HEIGHT, UPDATE_WAIT, KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN, PLAYER_HEALTH, BLOCK_COLOR } from './constants.js'
 
 function main (ctx, grid, player, opponents, bullets) {
   player.execute(grid)
@@ -18,7 +18,8 @@ function main (ctx, grid, player, opponents, bullets) {
     bullets[id].move()
   }
 
-  ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+  ctx.fillStyle = BLOCK_COLOR
+  ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
   grid.draw(ctx, player.generateDisplayCoords)
   for (let id in bullets) {
     // console.log(id)
@@ -201,6 +202,15 @@ export function setCanvas (canvas) {
     // console.log('INITCANVAS')
     canvas.width = CANVAS_WIDTH
     canvas.height = CANVAS_HEIGHT
+    canvas.oncontextmenu = (e) => {
+      e.preventDefault()
+    }
+    // window.addEventListener('resize', (e) => {
+    //   canvas.width = window.innerWidth
+    //   canvas.height = window.innerHeight
+    //   console.log(e)
+    // })
+
     ctx = canvas.getContext('2d')
 
     const event = new Event('finishCanvasInit')

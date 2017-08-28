@@ -16,6 +16,8 @@ export default class SpriteManager {
     this.size = [this.canvas.width, this.canvas.height]
     this.ctx = this.canvas.getContext('2d')
     this.ctx.imageSmoothingEnabled = false
+    this.ctx.webkitImageSmoothingEnabled = false
+    this.ctx.mozImageSmoothingEnabled = false
     this.rotate(0)
   }
 

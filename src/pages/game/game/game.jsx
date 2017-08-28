@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { setSocket, setCanvas } from './game.js'
+// import style from '../stylesheet.css'
 
 class Component extends React.Component {
   constructor (props) {
