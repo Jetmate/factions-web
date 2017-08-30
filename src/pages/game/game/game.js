@@ -8,6 +8,8 @@ import Gui from './Gui.js'
 import HealthBar from './HealthBar.js'
 import MiniMap from './MiniMap.js'
 
+import { rifle } from './guns.js'
+
 import { convertFromGrid } from './helpers.js'
 import { SCALE_FACTOR, CANVAS_WIDTH, CANVAS_HEIGHT, UPDATE_WAIT, KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN, PLAYER_HEALTH, BLOCK_COLOR, HEALTH_BAR_SIZE, ELEMENT_OFFSET, MINIMAP_SIZE } from './constants.js'
 
@@ -76,6 +78,7 @@ function init (ctx, socket) {
       bulletSprite,
       bulletStart,
       PLAYER_HEALTH,
+      rifle,
       healthBar,
       miniMap
     )
@@ -204,7 +207,6 @@ function initInput (player) {
   }
 
   document.addEventListener('visibilitychange', (event) => {
-    console.log(document.hidden)
     if (document.hidden) {
       player.reset()
     }

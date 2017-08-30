@@ -1,9 +1,8 @@
 import Element from './Element.js'
 
 export default class BulletBar extends Element {
-  constructor (initialSize, index, bulletNumber) {
+  constructor (initialSize, bulletNumber) {
     super(initialSize)
-    this.index = index
     this.reset(bulletNumber)
   }
 

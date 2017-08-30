@@ -5,7 +5,6 @@ export default class MiniMap extends Element {
   changeMarkerCoords (coords) {
     let percentage = [coords[0] / WIDTH, coords[1] / HEIGHT]
     this.markerCoords = [percentage[0] * this.innerSize[0] - MINIMAP_MARKER_WIDTH / 2, percentage[1] * this.innerSize[1] - MINIMAP_MARKER_WIDTH / 2]
-    console.log(percentage, this.innerSize, MINIMAP_MARKER_WIDTH)
   }
 
   draw (ctx) {

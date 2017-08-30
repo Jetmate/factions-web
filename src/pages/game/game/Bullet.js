@@ -1,16 +1,15 @@
-import { CENTER } from './constants.js'
+import { hypotenuse } from './helpers.js'
 
 export default class Bullet {
-  SPEED = 40
-
-  constructor (id, rotation, coords, velocity, spriteManager) {
+  constructor (id, rotation, coords, difference, spriteManager, speed) {
     this.id = id
     this.rotation = rotation
     this.direction = rotation + 1.5708
     this.spriteManager = spriteManager
     this.spriteManager.rotate(rotation)
     this.coords = coords
-    this.velocity = velocity
+    let scale = hypotenuse(difference) / speed
+    this.velocity = [difference[0] / scale, difference[1] / scale]
   }
 
   move () {
