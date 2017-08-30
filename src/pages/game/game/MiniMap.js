@@ -1,21 +1,16 @@
-import { MINIMAP_COORDS, MINIMAP_WIDTH, MINIMAP_BACKGROUND_COLOR, MINIMAP_PLAYER_COLOR, MINIMAP_UNIT_WIDTH, CANVAS_WIDTH, SCALE_FACTOR, MINIMAP_OUTLINE_COLOR } from './constants.js'
+import { MINIMAP_PLAYER_COLOR, MINIMAP_MARKER_WIDTH, WIDTH, HEIGHT } from './constants.js'
+import Element from './Element.js'
 
-export default class MiniMap {
-  constructor () {
-    this.sprite = document.createElement('canvas')
-    this.sprite.width = MINIMAP_WIDTH
-    this.sprite.height = MINIMAP_WIDTH
-    let ctx = this.sprite.getContext('2d')
-    ctx.fillStyle = MINIMAP_OUTLINE_COLOR
-    ctx.fillRect(0, 0, MINIMAP_WIDTH, MINIMAP_WIDTH)
-    ctx.fillStyle = MINIMAP_BACKGROUND_COLOR
-    ctx.fillRect(SCALE_FACTOR, SCALE_FACTOR, MINIMAP_WIDTH - SCALE_FACTOR * 2, MINIMAP_WIDTH - SCALE_FACTOR * 2)
+export default class MiniMap extends Element {
+  changeMarkerCoords (coords) {
+    let percentage = [coords[0] / WIDTH, coords[1] / HEIGHT]
+    this.markerCoords = [percentage[0] * this.innerSize[0] - MINIMAP_MARKER_WIDTH / 2, percentage[1] * this.innerSize[1] - MINIMAP_MARKER_WIDTH / 2]
+    console.log(percentage, this.innerSize, MINIMAP_MARKER_WIDTH)
   }
 
-  draw (ctx, percentage) {
-    ctx.drawImage(this.sprite, CANVAS_WIDTH - (MINIMAP_COORDS[0] + MINIMAP_WIDTH), MINIMAP_COORDS[1])
+  draw (ctx) {
+    ctx.drawImage(this.sprite, this.coords[0], this.coords[1])
     ctx.fillStyle = MINIMAP_PLAYER_COLOR
-    let markerCoords = [percentage[0] * MINIMAP_WIDTH - MINIMAP_UNIT_WIDTH / 2, percentage[1] * MINIMAP_WIDTH - MINIMAP_UNIT_WIDTH / 2]
-    ctx.fillRect(CANVAS_WIDTH - (MINIMAP_COORDS[0] + MINIMAP_WIDTH - markerCoords[0]) >> 0, MINIMAP_COORDS[1] + markerCoords[1] >> 0, MINIMAP_UNIT_WIDTH, MINIMAP_UNIT_WIDTH)
+    ctx.fillRect(this.coords[0] + this.markerCoords[0], this.coords[1] + this.markerCoords[1], MINIMAP_MARKER_WIDTH, MINIMAP_MARKER_WIDTH)
   }
 }

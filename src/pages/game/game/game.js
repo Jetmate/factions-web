@@ -4,11 +4,14 @@ import Player from './Player.js'
 import Opponent from './Opponent.js'
 import Bullet from './Bullet.js'
 import Grid from './Grid.js'
+import Gui from './Gui.js'
+import HealthBar from './HealthBar.js'
+import MiniMap from './MiniMap.js'
 
 import { convertFromGrid } from './helpers.js'
-import { SCALE_FACTOR, CANVAS_WIDTH, CANVAS_HEIGHT, UPDATE_WAIT, KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN, PLAYER_HEALTH, BLOCK_COLOR } from './constants.js'
+import { SCALE_FACTOR, CANVAS_WIDTH, CANVAS_HEIGHT, UPDATE_WAIT, KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN, PLAYER_HEALTH, BLOCK_COLOR, HEALTH_BAR_SIZE, ELEMENT_OFFSET, MINIMAP_SIZE } from './constants.js'
 
-function main (ctx, grid, player, opponents, bullets) {
+function main (ctx, grid, player, opponents, bullets, gui) {
   player.execute(grid)
   player.moveBullets(grid, opponents)
 
@@ -29,6 +32,7 @@ function main (ctx, grid, player, opponents, bullets) {
     opponents[id].draw(ctx, player.generateDisplayCoords)
   }
   player.draw(ctx, grid)
+  gui.drawElements(ctx)
   // ctx.fillStyle = 'yellow'
   // ctx.fillRect(player.fakeCoords[0], player.fakeCoords[1], player.spriteManager.size[0], player.spriteManager.size[1])
 }
@@ -55,18 +59,27 @@ function init (ctx, socket) {
   spriteSheetImage.onload = () => {
     const spriteSheet = new SpriteSheet(spriteSheetImage)
     const playerSprite = spriteSheet.getSprite(12, 8, true)
+    const bulletStart = [10.5 * SCALE_FACTOR, 5 * SCALE_FACTOR]
     const bulletSprite = spriteSheet.getSprite(3, 4, true)
     const blockSprite = spriteSheet.getSprite(16, 16, true)
 
-    const bulletStart = [10.5 * SCALE_FACTOR, 5 * SCALE_FACTOR]
+    let gui = new Gui()
+    let healthBar = gui.addElement(new HealthBar(HEALTH_BAR_SIZE, 1), ELEMENT_OFFSET, 0)
+    // let bulletBar = gui.addElement(new BulletBar(), ELEMENT_OFFSET, 0)
+    let miniMap = gui.addElement(new MiniMap(MINIMAP_SIZE), ELEMENT_OFFSET, 1)
+
+
     let player = new Player(
       convertFromGrid(JSON.parse(window.coords)),
       new SpriteManager(playerSprite),
       socket,
       bulletSprite,
       bulletStart,
-      PLAYER_HEALTH
+      PLAYER_HEALTH,
+      healthBar,
+      miniMap
     )
+
 
     socket.emit('new', window.id, player.coords)
 
@@ -139,7 +152,7 @@ function init (ctx, socket) {
     let updateTime = 0
     const update = (timestamp) => {
       if (timestamp - updateTime > UPDATE_WAIT) {
-        main(ctx, grid, player, opponents, bullets)
+        main(ctx, grid, player, opponents, bullets, gui)
         updateTime = timestamp
         window.requestAnimationFrame(update)
       } else {
@@ -183,6 +196,17 @@ function initInput (player) {
       case KEY_DOWN:
         player.unmove('DOWN')
         break
+    }
+  })
+
+  document.onvisibilitychange = (event) => {
+    console.log('changed')
+  }
+
+  document.addEventListener('visibilitychange', (event) => {
+    console.log(document.hidden)
+    if (document.hidden) {
+      player.reset()
     }
   })
 

@@ -1,27 +1,25 @@
 import { findCenter, generateId, checkCollision, hypotenuse, findAllGridCoords, convertFromGrid } from './helpers.js'
-import { BLOCK_SIZE, CANVAS_WIDTH, CANVAS_HEIGHT, CENTER, BULLET_SPEED, PLAYER_SPEED, HEALTH_BAR_COORDS, HEALTH_BAR_SIZE } from './constants.js'
+import { BLOCK_SIZE, CANVAS_WIDTH, CANVAS_HEIGHT, CENTER, BULLET_SPEED, PLAYER_SPEED } from './constants.js'
 import Bullet from './Bullet.js'
 import SpriteManager from './SpriteManager.js'
-import HealthBar from './HealthBar.js'
-import MiniMap from './MiniMap.js'
 
 export default class Player {
-  constructor (coords, spriteManager, socket, bulletSprite, bulletStart, health) {
+  constructor (coords, spriteManager, socket, bulletSprite, bulletStart, health, healthBar, miniMap) {
     this.spriteManager = spriteManager
     this.coords = findCenter(BLOCK_SIZE, this.spriteManager.size, coords)
     this.fakeCoords = findCenter([CANVAS_WIDTH, CANVAS_HEIGHT], this.spriteManager.size)
     this.fakeCoords[0] = this.fakeCoords[0] >> 0
     this.fakeCoords[1] = this.fakeCoords[1] >> 0
-    this.movement = [0, 0]
     this.rotation = 0
-    this.directions = {'RIGHT': false, 'LEFT': false, 'UP': false, 'DOWN': false}
+    this.reset()
     this.socket = socket
     this.bulletSprite = bulletSprite
     this.bullets = []
     this.bulletStartDiff = hypotenuse([bulletStart[0] - this.spriteManager.size[0] / 2, bulletStart[1] - this.spriteManager.size[1] / 2])
-    this.healthBar = new HealthBar(HEALTH_BAR_SIZE, 1)
-    this.miniMap = new MiniMap()
     this.health = this.initialHealth = health
+    this.healthBar = healthBar
+    this.miniMap = miniMap
+    this.miniMap.changeMarkerCoords(this.coords)
   }
 
   move (direction) {
@@ -74,6 +72,11 @@ export default class Player {
     }
   }
 
+  reset () {
+    this.movement = [0, 0]
+    this.directions = {'RIGHT': false, 'LEFT': false, 'UP': false, 'DOWN': false}
+  }
+
   rotate (cursorX, cursorY) {
     let cursorDiff = [cursorX - CENTER[0], cursorY - CENTER[1]]
     this.rotation = Math.atan(cursorDiff[1] / cursorDiff[0]) + -1.5708
@@ -87,8 +90,6 @@ export default class Player {
 
   draw (ctx, grid) {
     ctx.drawImage(this.spriteManager.currentSprite(), this.fakeCoords[0], this.fakeCoords[1])
-    this.healthBar.draw(ctx, HEALTH_BAR_COORDS)
-    this.miniMap.draw(ctx, [this.coords[0] / grid.canvas.width, this.coords[1] / grid.canvas.height])
   }
 
   generateDisplayCoords = (coords) => {
@@ -146,6 +147,7 @@ export default class Player {
       }
 
       this.socket.emit('playerChange', window.id, 'coords', this.coords)
+      this.miniMap.changeMarkerCoords(this.coords)
     }
   }
 
