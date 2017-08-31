@@ -1,10 +1,12 @@
 import { findCenter, generateId, checkCollision, hypotenuse, findAllGridCoords, convertFromGrid } from './helpers.js'
-import { BLOCK_SIZE, CANVAS_WIDTH, CANVAS_HEIGHT, CENTER, PLAYER_SPEED } from './constants.js'
+import { BLOCK_SIZE, CANVAS_WIDTH, CANVAS_HEIGHT, CENTER, PLAYER_SPEED, CURSOR_AIMING, CURSOR_RELOADING } from './constants.js'
 import SpriteManager from './SpriteManager.js'
 
 export default class Player {
-  constructor (coords, spriteManager, socket, bulletSprite, bulletStart, health, currentGun, healthBar, miniMap, bulletBar) {
+  constructor (canvasStyle, coords, spriteManager, socket, bulletSprite, bulletStart, health, currentGun, healthBar, miniMap, bulletBar) {
     this.spriteManager = spriteManager
+    this.canvasStyle = canvasStyle
+    canvasStyle.cursor = CURSOR_AIMING
     this.coords = findCenter(BLOCK_SIZE, this.spriteManager.size, coords)
     this.fakeCoords = findCenter([CANVAS_WIDTH, CANVAS_HEIGHT], this.spriteManager.size)
     this.fakeCoords[0] = this.fakeCoords[0] >> 0
@@ -155,34 +157,43 @@ export default class Player {
   }
 
   shoot (cursorX, cursorY) {
-    let bulletSpriteManager = new SpriteManager(this.bulletSprite)
-    let offset = [
-      Math.cos(this.rotation) * this.bulletStartDiff,
-      Math.sin(this.rotation) * this.bulletStartDiff
-    ]
-    let difference = [
-      (cursorX - bulletSpriteManager.sprite.width / 2) - (CENTER[0] + offset[0]),
-      (cursorY - bulletSpriteManager.sprite.height / 2) - (CENTER[1] + offset[1])
-    ]
-    let center = [
-      this.coords[0] + this.spriteManager.size[0] / 2,
-      this.coords[1] + this.spriteManager.size[1] / 2
-    ]
-    let bullet = new this.currentGun.Bullet(
-      generateId(),
-      this.rotation,
-      [
-        center[0] + offset[0] - bulletSpriteManager.size[0] / 2,
-        center[1] + offset[1] - bulletSpriteManager.size[1] / 2
-      ],
-      difference,
-      bulletSpriteManager,
-      this.currentGun.speed
-    )
-    this.bullets.push(bullet)
-    this.ammo--
-    this.bulletBar.changeAmmo(this.ammo)
-    this.socket.emit('newBullet', bullet.id, bullet.coords, this.rotation, bullet.velocity)
+    if (this.ammo) {
+      let bulletSpriteManager = new SpriteManager(this.bulletSprite)
+      let offset = [
+        Math.cos(this.rotation) * this.bulletStartDiff,
+        Math.sin(this.rotation) * this.bulletStartDiff
+      ]
+      let difference = [
+        (cursorX - bulletSpriteManager.sprite.width / 2) - (CENTER[0] + offset[0]),
+        (cursorY - bulletSpriteManager.sprite.height / 2) - (CENTER[1] + offset[1])
+      ]
+      let center = [
+        this.coords[0] + this.spriteManager.size[0] / 2,
+        this.coords[1] + this.spriteManager.size[1] / 2
+      ]
+      let bullet = new this.currentGun.Bullet(
+        generateId(),
+        this.rotation,
+        [
+          center[0] + offset[0] - bulletSpriteManager.size[0] / 2,
+          center[1] + offset[1] - bulletSpriteManager.size[1] / 2
+        ],
+        difference,
+        bulletSpriteManager,
+        this.currentGun.speed
+      )
+      this.bullets.push(bullet)
+      this.ammo--
+      this.bulletBar.changeAmmo(this.ammo)
+      this.socket.emit('newBullet', bullet.id, bullet.coords, this.rotation, bullet.velocity)
+    } else {
+      this.canvasStyle.cursor = CURSOR_RELOADING
+      window.setTimeout(() => {
+        this.ammo = this.currentGun.ammo
+        this.bulletBar.changeAmmo(this.ammo)
+        this.canvasStyle.cursor = CURSOR_AIMING
+      }, this.currentGun.reloadTime)
+    }
   }
 
   moveBullets (grid, players) {

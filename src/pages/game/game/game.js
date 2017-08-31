@@ -72,6 +72,7 @@ function init (ctx, socket) {
     let miniMap = gui.addElement(new MiniMap(MINIMAP_SIZE), ELEMENT_OFFSET, 1)
 
     let player = new Player(
+      ctx.canvas.style,
       convertFromGrid(JSON.parse(window.coords)),
       new SpriteManager(playerSprite),
       socket,

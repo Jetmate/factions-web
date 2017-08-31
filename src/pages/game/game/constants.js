@@ -59,4 +59,7 @@ export const
   BULLET_BAR_GAP = SCALE_FACTOR,
   BULLET_BAR_BULLET_OUTLINE = '#C0B283',
   BULLET_BAR_BULLET_COLOR = '#DCD0C0',
-  BULLET_BAR_SIZE = [100, 50]
+  BULLET_BAR_SIZE = [100, 50],
+
+  CURSOR_AIMING = 'url(media/aiming.gif), auto',
+  CURSOR_RELOADING = 'url(media/reloading1.gif), auto'
