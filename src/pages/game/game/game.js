@@ -7,11 +7,12 @@ import Grid from './Grid.js'
 import Gui from './Gui.js'
 import HealthBar from './HealthBar.js'
 import MiniMap from './MiniMap.js'
+import BulletBar from './BulletBar.js'
 
 import { rifle } from './guns.js'
 
 import { convertFromGrid } from './helpers.js'
-import { SCALE_FACTOR, CANVAS_WIDTH, CANVAS_HEIGHT, UPDATE_WAIT, KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN, PLAYER_HEALTH, BLOCK_COLOR, HEALTH_BAR_SIZE, ELEMENT_OFFSET, MINIMAP_SIZE } from './constants.js'
+import { SCALE_FACTOR, CANVAS_WIDTH, CANVAS_HEIGHT, UPDATE_WAIT, KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN, PLAYER_HEALTH, BLOCK_COLOR, HEALTH_BAR_SIZE, ELEMENT_OFFSET, MINIMAP_SIZE, BULLET_BAR_SIZE } from './constants.js'
 
 function main (ctx, grid, player, opponents, bullets, gui) {
   player.execute(grid)
@@ -67,9 +68,9 @@ function init (ctx, socket) {
 
     let gui = new Gui()
     let healthBar = gui.addElement(new HealthBar(HEALTH_BAR_SIZE, 1), ELEMENT_OFFSET, 0)
-    // let bulletBar = gui.addElement(new BulletBar(), ELEMENT_OFFSET, 0)
+    let bulletBar = gui.addElement(new BulletBar(BULLET_BAR_SIZE), ELEMENT_OFFSET, 0)
     let miniMap = gui.addElement(new MiniMap(MINIMAP_SIZE), ELEMENT_OFFSET, 1)
-
+    console.log(bulletBar.coords)
 
     let player = new Player(
       convertFromGrid(JSON.parse(window.coords)),
@@ -80,7 +81,8 @@ function init (ctx, socket) {
       PLAYER_HEALTH,
       rifle,
       healthBar,
-      miniMap
+      miniMap,
+      bulletBar
     )
 
 

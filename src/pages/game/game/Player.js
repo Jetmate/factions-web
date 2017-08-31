@@ -3,7 +3,7 @@ import { BLOCK_SIZE, CANVAS_WIDTH, CANVAS_HEIGHT, CENTER, PLAYER_SPEED } from '.
 import SpriteManager from './SpriteManager.js'
 
 export default class Player {
-  constructor (coords, spriteManager, socket, bulletSprite, bulletStart, health, currentGun, healthBar, miniMap) {
+  constructor (coords, spriteManager, socket, bulletSprite, bulletStart, health, currentGun, healthBar, miniMap, bulletBar) {
     this.spriteManager = spriteManager
     this.coords = findCenter(BLOCK_SIZE, this.spriteManager.size, coords)
     this.fakeCoords = findCenter([CANVAS_WIDTH, CANVAS_HEIGHT], this.spriteManager.size)
@@ -17,9 +17,12 @@ export default class Player {
     this.bulletStartDiff = hypotenuse([bulletStart[0] - this.spriteManager.size[0] / 2, bulletStart[1] - this.spriteManager.size[1] / 2])
     this.health = this.initialHealth = health
     this.currentGun = currentGun
+    this.ammo = currentGun.ammo
     this.healthBar = healthBar
     this.miniMap = miniMap
     this.miniMap.changeMarkerCoords(this.coords)
+    this.bulletBar = bulletBar
+    this.bulletBar.setGun(this.currentGun)
   }
 
   move (direction) {
@@ -176,8 +179,10 @@ export default class Player {
       bulletSpriteManager,
       this.currentGun.speed
     )
-    this.socket.emit('newBullet', bullet.id, bullet.coords, this.rotation, bullet.velocity)
     this.bullets.push(bullet)
+    this.ammo--
+    this.bulletBar.changeAmmo(this.ammo)
+    this.socket.emit('newBullet', bullet.id, bullet.coords, this.rotation, bullet.velocity)
   }
 
   moveBullets (grid, players) {
