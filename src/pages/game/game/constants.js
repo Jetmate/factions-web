@@ -31,7 +31,7 @@ export const
   ELEMENT_OFFSET = 25,
   GUI_PADDING = [50, 50],
 
-  HEALTH_BAR_SIZE = [100, 500],
+  HEALTH_BAR_SIZE = [100, 300],
   HEALTH_BAR_COLOR = '#96858f',
 
   HEALTH_BAR2_SIZE = [15 * SCALE_FACTOR, 5 * SCALE_FACTOR],
@@ -59,7 +59,7 @@ export const
   BULLET_BAR_GAP = SCALE_FACTOR,
   BULLET_BAR_BULLET_OUTLINE = '#C0B283',
   BULLET_BAR_BULLET_COLOR = '#DCD0C0',
-  BULLET_BAR_SIZE = [100, 50],
+  BULLET_BAR_SIZE = [100, 300],
 
   CURSOR_AIMING = 'url(media/aiming.gif), auto',
   CURSOR_RELOADING = ['url(media/reloading1.gif), auto', 'url(media/reloading2.gif), auto', 'url(media/reloading3.gif), auto', 'url(media/reloading4.gif), auto']

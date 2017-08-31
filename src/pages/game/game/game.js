@@ -68,8 +68,8 @@ function init (ctx, socket) {
 
     let gui = new Gui()
     let healthBar = gui.addElement(new HealthBar(HEALTH_BAR_SIZE, 1), ELEMENT_OFFSET, 0)
-    let bulletBar = gui.addElement(new BulletBar(BULLET_BAR_SIZE), ELEMENT_OFFSET, 0)
-    let miniMap = gui.addElement(new MiniMap(MINIMAP_SIZE), ELEMENT_OFFSET, 1)
+    let bulletBar = gui.addElement(new BulletBar(BULLET_BAR_SIZE, 1), ELEMENT_OFFSET, 0)
+    let miniMap = gui.addElement(new MiniMap(MINIMAP_SIZE), ELEMENT_OFFSET, 0)
 
     let player = new Player(
       ctx.canvas.style,
