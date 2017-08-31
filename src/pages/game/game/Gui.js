@@ -1,16 +1,16 @@
-import { CANVAS_WIDTH } from './constants.js'
+import { CANVAS_WIDTH, GUI_PADDING } from './constants.js'
 
 export default class Gui {
-  grid = [0, 0]
+  grid = [GUI_PADDING[1], GUI_PADDING[1]]
   elements = []
 
   addElement (element, offset, side) {
     this.elements.push(element)
     element.coords = [
-      side ? CANVAS_WIDTH - (element.size[0] + offset[0]) : offset[0],
-      this.grid[side] + offset[1]
+      side ? CANVAS_WIDTH - (element.size[0] + GUI_PADDING[0]) : GUI_PADDING[0],
+      this.grid[side]
     ]
-    this.grid[side] += offset[1] + element.size[1]
+    this.grid[side] += offset + element.size[1]
     return element
   }
 

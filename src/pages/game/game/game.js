@@ -70,7 +70,6 @@ function init (ctx, socket) {
     let healthBar = gui.addElement(new HealthBar(HEALTH_BAR_SIZE, 1), ELEMENT_OFFSET, 0)
     let bulletBar = gui.addElement(new BulletBar(BULLET_BAR_SIZE), ELEMENT_OFFSET, 0)
     let miniMap = gui.addElement(new MiniMap(MINIMAP_SIZE), ELEMENT_OFFSET, 1)
-    console.log(bulletBar.coords)
 
     let player = new Player(
       convertFromGrid(JSON.parse(window.coords)),
