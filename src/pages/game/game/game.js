@@ -151,17 +151,31 @@ function init (ctx, socket) {
 
     initInput(player)
 
+    // let updateTime = 0
+    // const update = (timestamp) => {
+    //   if (timestamp - updateTime > UPDATE_WAIT) {
+    //     main(ctx, grid, player, opponents, bullets, gui)
+    //     updateTime = timestamp
+    //     window.requestAnimationFrame(update)
+    //   } else {
+    //     window.requestAnimationFrame(update)
+    //   }
+    // }
+
     let currentTime = 0
-    let accumulator = 0
     const update = (timestamp) => {
       let frameTime = timestamp - currentTime
-      currentTime = timestamp
-      accumulator += frameTime
-      while (accumulator >= UPDATE_WAIT) {
-        main(grid, player, opponents, bullets)
-        accumulator -= UPDATE_WAIT
+      if (frameTime >= UPDATE_WAIT) {
+        currentTime = timestamp
+        let accumulator = frameTime
+        // console.log('timestamp', timestamp, 'accumulator', accumulator, 'frame time', frameTime)
+        while (accumulator >= UPDATE_WAIT) {
+          main(grid, player, opponents, bullets)
+          accumulator -= UPDATE_WAIT
+          // console.log('doing...', accumulator)
+        }
+        draw(ctx, gui, grid, player, opponents, bullets)
       }
-      draw(ctx, gui, grid, player, opponents, bullets)
       window.requestAnimationFrame(update)
     }
     window.requestAnimationFrame(update)
