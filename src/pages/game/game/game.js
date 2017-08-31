@@ -14,20 +14,19 @@ import { rifle } from './guns.js'
 import { convertFromGrid } from './helpers.js'
 import { SCALE_FACTOR, CANVAS_WIDTH, CANVAS_HEIGHT, UPDATE_WAIT, KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN, PLAYER_HEALTH, BLOCK_COLOR, HEALTH_BAR_SIZE, ELEMENT_OFFSET, MINIMAP_SIZE, BULLET_BAR_SIZE } from './constants.js'
 
-function main (ctx, grid, player, opponents, bullets, gui) {
+function main (grid, player, opponents, bullets) {
   player.execute(grid)
   player.moveBullets(grid, opponents)
-
   for (let id in bullets) {
     bullets[id].move()
   }
+}
 
+function draw (ctx, gui, grid, player, opponents, bullets) {
   ctx.fillStyle = BLOCK_COLOR
   ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
   grid.draw(ctx, player.generateDisplayCoords)
   for (let id in bullets) {
-    // console.log(id)
-    // console.log(bullets[id])
     bullets[id].draw(ctx, player.generateDisplayCoords)
   }
   player.drawBullets(ctx)
@@ -36,8 +35,6 @@ function main (ctx, grid, player, opponents, bullets, gui) {
   }
   player.draw(ctx, grid)
   gui.drawElements(ctx)
-  // ctx.fillStyle = 'yellow'
-  // ctx.fillRect(player.fakeCoords[0], player.fakeCoords[1], player.spriteManager.size[0], player.spriteManager.size[1])
 }
 
 let ctx, socket
@@ -154,15 +151,18 @@ function init (ctx, socket) {
 
     initInput(player)
 
-    let updateTime = 0
+    let currentTime = 0
+    let accumulator = 0
     const update = (timestamp) => {
-      if (timestamp - updateTime > UPDATE_WAIT) {
-        main(ctx, grid, player, opponents, bullets, gui)
-        updateTime = timestamp
-        window.requestAnimationFrame(update)
-      } else {
-        window.requestAnimationFrame(update)
+      let frameTime = timestamp - currentTime
+      currentTime = timestamp
+      accumulator += frameTime
+      while (accumulator >= UPDATE_WAIT) {
+        main(grid, player, opponents, bullets)
+        accumulator -= UPDATE_WAIT
       }
+      draw(ctx, gui, grid, player, opponents, bullets)
+      window.requestAnimationFrame(update)
     }
     window.requestAnimationFrame(update)
   }
