@@ -186,13 +186,22 @@ export default class Player {
       this.ammo--
       this.bulletBar.changeAmmo(this.ammo)
       this.socket.emit('newBullet', bullet.id, bullet.coords, this.rotation, bullet.velocity)
-    } else {
-      this.canvasStyle.cursor = CURSOR_RELOADING
-      window.setTimeout(() => {
-        this.ammo = this.currentGun.ammo
-        this.bulletBar.changeAmmo(this.ammo)
-        this.canvasStyle.cursor = CURSOR_AIMING
-      }, this.currentGun.reloadTime)
+    } else if (!this.reloading) {
+      this.reloading = true
+      this.canvasStyle.cursor = CURSOR_RELOADING[0]
+      let cursorFrame = 0
+      let interval = window.setInterval(() => {
+        if (cursorFrame === CURSOR_RELOADING.length) {
+          window.clearInterval(interval)
+          this.ammo = this.currentGun.ammo
+          this.bulletBar.changeAmmo(this.ammo)
+          this.canvasStyle.cursor = CURSOR_AIMING
+          this.reloading = false
+        } else {
+          cursorFrame++
+          this.canvasStyle.cursor = CURSOR_RELOADING[cursorFrame]
+        }
+      }, this.currentGun.reloadTime / CURSOR_RELOADING.length)
     }
   }
 

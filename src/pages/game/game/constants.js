@@ -62,4 +62,4 @@ export const
   BULLET_BAR_SIZE = [100, 50],
 
   CURSOR_AIMING = 'url(media/aiming.gif), auto',
-  CURSOR_RELOADING = 'url(media/reloading1.gif), auto'
+  CURSOR_RELOADING = ['url(media/reloading1.gif), auto', 'url(media/reloading2.gif), auto', 'url(media/reloading3.gif), auto', 'url(media/reloading4.gif), auto']
