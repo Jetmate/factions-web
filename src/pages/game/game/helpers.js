@@ -89,3 +89,12 @@ export function checkCollision (coords1, size1, coords2, size2) {
 export function hypotenuse (coords) {
   return Math.sqrt(coords[0] ** 2 + coords[1] ** 2)
 }
+
+export function initCanvas (canvas, size) {
+  canvas.width = size[0]
+  canvas.height = size[1]
+  canvas.oncontextmenu = (e) => {
+    e.preventDefault()
+  }
+  return canvas.getContext('2d')
+}

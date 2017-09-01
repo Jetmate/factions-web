@@ -1,10 +1,11 @@
 import { HEALTH_BAR2_OFFSET, HEALTH_BAR2_SIZE, PLAYER_HEALTH } from './constants.js'
 import HealthBar from './HealthBar.js'
+import Thing from './Thing.js'
 
-export default class Opponent {
+export default class Opponent extends Thing {
   constructor (coords, spriteManager, health) {
-    this.spriteManager = spriteManager
-    this.coords = coords
+    super(coords, spriteManager)
+
     this.health = health
     this.initialHealth = PLAYER_HEALTH
     this.healthBar = new HealthBar(HEALTH_BAR2_SIZE, 0)
@@ -26,8 +27,10 @@ export default class Opponent {
 
   takeDamage () {
     this.health--
+    if (this.health === 0) {
+      return true
+    }
     this.healthBar.changeHealth(this.health / this.initialHealth)
-    console.log(this.health / this.initialHealth)
   }
 
   draw (ctx, coordsFunc) {

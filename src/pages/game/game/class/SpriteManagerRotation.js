@@ -13,12 +13,12 @@ export default class SpriteManager {
 
     this.canvas.width = this.diagonal * SCALE_FACTOR
     this.canvas.height = this.canvas.width
-    this.size = [this.canvas.width, this.canvas.height]
+
     this.ctx = this.canvas.getContext('2d')
     this.ctx.imageSmoothingEnabled = false
     this.ctx.webkitImageSmoothingEnabled = false
     this.ctx.mozImageSmoothingEnabled = false
-    this.rotate(0)
+    this.ctx.drawImage(this.sprite, 0, 0)
   }
 
   rotate (rotation) {

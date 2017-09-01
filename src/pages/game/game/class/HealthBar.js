@@ -2,8 +2,8 @@ import { HEALTH_BAR_COLOR, SCALE_FACTOR } from './constants.js'
 import Element from './Element.js'
 
 export default class HealthBar extends Element {
-  constructor (initialSize, index) {
-    super(initialSize)
+  constructor (initialSize, index, canvas) {
+    super(initialSize, canvas)
     this.index = index
     this.length = this.innerSize[index]
   }

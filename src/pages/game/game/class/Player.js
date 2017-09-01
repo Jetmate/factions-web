@@ -1,9 +1,10 @@
 import { findCenter, generateId, checkCollision, hypotenuse, findAllGridCoords, convertFromGrid } from './helpers.js'
 import { BLOCK_SIZE, CANVAS_WIDTH, CANVAS_HEIGHT, CENTER, PLAYER_SPEED, CURSOR_AIMING, CURSOR_RELOADING } from './constants.js'
 import SpriteManager from './SpriteManager.js'
+import { changePlayerCoords, setAmmoCapacity, changeHealth, changeAmmo } from '../../../../redux/'
 
 export default class Player {
-  constructor (canvasStyle, coords, spriteManager, socket, bulletSprite, bulletStart, health, currentGun) {
+  constructor (coords, spriteManager, canvasStyle, socket, bulletSprite, bulletStart, health, currentGun) {
     this.spriteManager = spriteManager
     this.canvasStyle = canvasStyle
     canvasStyle.cursor = CURSOR_AIMING
@@ -20,10 +21,9 @@ export default class Player {
     this.health = this.initialHealth = health
     this.currentGun = currentGun
     this.ammo = currentGun.ammo
-    this.healthBar = healthBar
-    this.miniMap = miniMap
-    changeMarkerCoords(this.coords)
-    setGun(this.currentGun)
+
+    changePlayerCoords(this.coords)
+    setAmmoCapacity(this.currentGun.ammo)
   }
 
   move (direction) {
@@ -151,7 +151,7 @@ export default class Player {
       }
 
       this.socket.emit('playerChange', window.id, 'coords', this.coords)
-      this.miniMap.changeMarkerCoords(this.coords)
+      this.miniMap.changePlayerCoords(this.coords)
     }
   }
 
@@ -247,6 +247,6 @@ export default class Player {
 
   takeDamage () {
     this.health--
-    this.healthBar.changeHealth(this.health / this.initialHealth)
+    changeHealth(this.health / this.initialHealth)
   }
 }

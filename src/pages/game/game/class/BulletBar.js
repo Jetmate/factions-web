@@ -2,15 +2,15 @@ import { BULLET_BAR_GAP, BULLET_BAR_BULLET_OUTLINE, BULLET_BAR_BULLET_COLOR, SCA
 import Element from './Element.js'
 
 export default class BulletBar extends Element {
-  constructor (initialSize, index) {
-    super(initialSize)
+  constructor (initialSize, index, canvas) {
+    super(initialSize, canvas)
     this.index = index
   }
 
-  setGun (gun) {
-    this.ammo = gun.ammo
+  setAmmoCapacity (ammoCapacity) {
+    this.ammo = ammoCapacity
     this.bulletSprite = document.createElement('canvas')
-    this.drawGap = (this.innerSize[this.index] - SCALE_FACTOR * 2 + BULLET_BAR_GAP) / gun.ammo
+    this.drawGap = (this.innerSize[this.index] - SCALE_FACTOR * 2 + BULLET_BAR_GAP) / ammoCapacity
     if (this.index === 0) {
       this.bulletSprite.width = this.drawGap - BULLET_BAR_GAP
       this.bulletSprite.height = this.innerSize[1] - SCALE_FACTOR * 2

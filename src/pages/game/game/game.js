@@ -8,17 +8,19 @@ import Gui from './Gui.js'
 import HealthBar from './HealthBar.js'
 import MiniMap from './MiniMap.js'
 import BulletBar from './BulletBar.js'
+// import Leaderboard from './Leaderboard.js'
 
 import { rifle } from './guns.js'
 
 import { convertFromGrid } from './helpers.js'
-import { SCALE_FACTOR, CANVAS_WIDTH, CANVAS_HEIGHT, UPDATE_WAIT, KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN, PLAYER_HEALTH, BLOCK_COLOR, HEALTH_BAR_SIZE, ELEMENT_OFFSET, MINIMAP_SIZE, BULLET_BAR_SIZE } from './constants.js'
+import { SCALE_FACTOR, CANVAS_WIDTH, CANVAS_HEIGHT, UPDATE_WAIT, KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN, PLAYER_HEALTH, BLOCK_COLOR, HEALTH_BAR_SIZE, ELEMENT_OFFSET, MINIMAP_SIZE, BULLET_BAR_SIZE, LEADERBOARD_SIZE, FONT } from './constants.js'
 
 function main (grid, player, opponents, bullets) {
   player.execute(grid)
   player.moveBullets(grid, opponents)
   for (let id in bullets) {
     bullets[id].move()
+    // console.log(bullets[id].coords)
   }
 }
 
@@ -67,6 +69,7 @@ function init (ctx, socket) {
     let healthBar = gui.addElement(new HealthBar(HEALTH_BAR_SIZE, 1), ELEMENT_OFFSET, 0)
     let bulletBar = gui.addElement(new BulletBar(BULLET_BAR_SIZE, 1), ELEMENT_OFFSET, 0)
     let miniMap = gui.addElement(new MiniMap(MINIMAP_SIZE), ELEMENT_OFFSET, 0)
+    // let leaderboard = gui.addElement(new Leaderboard(LEADERBOARD_SIZE), ELEMENT_OFFSET, 1)
 
     let player = new Player(
       ctx.canvas.style,
@@ -91,17 +94,18 @@ function init (ctx, socket) {
     let bullets = {}
 
 
-    socket.on('newBullet', (id, coords, rotation, velocity) => {
-      bullets[id] = new Bullet(id, rotation, coords, velocity, new SpriteManager(bulletSprite))
+    socket.on('newBullet', (id, rotation, coords, difference, speed) => {
+      bullets[id] = new Bullet(id, rotation, coords, difference, new SpriteManager(bulletSprite), speed)
+      console.log(coords)
     })
 
     socket.on('bulletCrash', (id) => {
       delete bullets[id]
     })
 
-    socket.on('bulletHit', (id, playerId) => {
+    socket.on('bulletHit', (bulletId, playerId) => {
       // console.log('HIT')
-      delete bullets[id]
+      delete bullets[bulletId]
       if (playerId === window.id) {
         player.takeDamage()
       } else if (playerId in opponents) {
@@ -115,11 +119,12 @@ function init (ctx, socket) {
       console.log('OPPONENTS', opponents)
     })
 
-    socket.on('playerDeath', (playerId) => {
+    socket.on('playerDeath', (playerId, killerId) => {
       console.log('DEATH')
       if (playerId in opponents) {
         delete opponents[playerId]
       }
+      // leaderboard.players[shooterId]++
     })
 
 
@@ -253,6 +258,7 @@ export function setCanvas (canvas) {
     // })
 
     ctx = canvas.getContext('2d')
+    ctx.font = FONT
 
     const event = new Event('finishCanvasInit')
     document.dispatchEvent(event)

@@ -62,4 +62,9 @@ export const
   BULLET_BAR_SIZE = [100, 300],
 
   CURSOR_AIMING = 'url(media/aiming.gif), auto',
-  CURSOR_RELOADING = ['url(media/reloading1.gif), auto', 'url(media/reloading2.gif), auto', 'url(media/reloading3.gif), auto', 'url(media/reloading4.gif), auto']
+  CURSOR_RELOADING = ['url(media/reloading1.gif), auto', 'url(media/reloading2.gif), auto', 'url(media/reloading3.gif), auto', 'url(media/reloading4.gif), auto'],
+
+  FONT = '10px sans-serif',
+  LEADERBOARD_ROW_HEIGHT = 10,
+  LEADERBOARD_ROW_NUMBER = 10,
+  LEADERBOARD_SIZE = [LEADERBOARD_ROW_HEIGHT * LEADERBOARD_ROW_NUMBER, 100]

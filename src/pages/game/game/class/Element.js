@@ -1,10 +1,13 @@
 import { SCALE_FACTOR, ELEMENT_OUTLINE_COLOR, ELEMENT_BACKGROUND_COLOR } from './constants.js'
 
 export default class Element {
-  constructor (size) {
+  constructor (size, canvas) {
     this.size = size
+    if (canvas === undefined) {
+      canvas = document.createElement('canvas')
+    }
+    this.sprite = canvas
     this.innerSize = [size[0] - SCALE_FACTOR * 2, size[1] - SCALE_FACTOR * 2]
-    this.sprite = document.createElement('canvas')
     this.sprite.width = size[0]
     this.sprite.height = size[1]
     let ctx = this.sprite.getContext('2d')
