@@ -8,6 +8,9 @@ export default class MiniMap extends Element {
   }
 
   draw (ctx) {
+    if (ctx === undefined) {
+      ctx = this.
+    }
     ctx.drawImage(this.sprite, this.coords[0], this.coords[1])
     ctx.fillStyle = MINIMAP_PLAYER_COLOR
     ctx.fillRect(this.coords[0] + this.markerCoords[0], this.coords[1] + this.markerCoords[1], MINIMAP_MARKER_WIDTH, MINIMAP_MARKER_WIDTH)

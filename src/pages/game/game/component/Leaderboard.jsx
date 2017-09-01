@@ -1,4 +1,5 @@
 import React from 'react'
+import { connect } from 'react-redux'
 
 import { HEALTH_BAR_SIZE } from '../constants.js'
 import HealthBar from '../class/HealthBar.js'
@@ -23,3 +24,12 @@ export default class Component extends React.Component {
     this.healthBar = new HealthBar(HEALTH_BAR_SIZE, 1, canvas)
   }
 }
+
+const mapStateToProps = (state) => {
+  return {
+    currentUser: state.currentUser,
+    createPostLocation: state.createPostLocation
+  }
+}
+
+export default connect(mapStateToProps)(PostDialog)

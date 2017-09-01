@@ -6,7 +6,7 @@ import MiniMap from '../class/MiniMap.js'
 
 export default class Component extends React.Component {
   componentWillReceiveProps (nextProps) {
-    this.miniMap.changeHealth(nextProps.health)
+    this.miniMap.changeMarkerCoords(nextProps.coords)
     this.miniMap.draw(this.ctx)
   }
 
@@ -24,3 +24,12 @@ export default class Component extends React.Component {
     this.miniMap = new MiniMap(HEALTH_BAR_SIZE, 1, canvas)
   }
 }
+
+const mapStateToProps = (state) => {
+  return {
+    currentUser: state.currentUser,
+    createPostLocation: state.createPostLocation
+  }
+}
+
+export default connect(mapStateToProps)(PostDialog)
