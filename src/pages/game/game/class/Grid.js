@@ -1,4 +1,4 @@
-import { BLOCK_WIDTH, REAL_BLOCK_WIDTH, SCALE_FACTOR, GRID_COLOR, BLOCK_OUTLINE_COLOR, BLOCK_COLOR, BLOCK_OUTLINE_WIDTH, FLOOR_COLOR } from '../constants.js'
+import { BLOCK_WIDTH, REAL_BLOCK_WIDTH, SCALE_FACTOR, BLOCK_OUTLINE_COLOR, BLOCK_COLOR, BLOCK_OUTLINE_WIDTH, FLOOR_COLOR } from '../constants.js'
 
 export default class Grid {
   constructor (grid, blockSprite) {
@@ -18,23 +18,23 @@ export default class Grid {
   }
 
   generateSprite () {
-    this.ctx.beginPath()
-    this.ctx.strokeStyle = GRID_COLOR
-    let begin, end
-    for (let x = 0; x <= this.width; x++) {
-      begin = [x * REAL_BLOCK_WIDTH, 0]
-      end = [x * REAL_BLOCK_WIDTH, this.canvas.height]
-      // console.log('begin', begin, 'end', end)
-      this.ctx.moveTo(begin[0], begin[1])
-      this.ctx.lineTo(end[0], end[1])
-    }
-    for (let y = 0; y <= this.height; y++) {
-      begin = [0, y * REAL_BLOCK_WIDTH]
-      end = [this.canvas.width, y * REAL_BLOCK_WIDTH]
-      this.ctx.moveTo(begin[0], begin[1])
-      this.ctx.lineTo(end[0], end[1])
-    }
-    this.ctx.stroke()
+    // this.ctx.beginPath()
+    // this.ctx.strokeStyle = GRID_COLOR
+    // let begin, end
+    // for (let x = 0; x <= this.width; x++) {
+    //   begin = [x * REAL_BLOCK_WIDTH, 0]
+    //   end = [x * REAL_BLOCK_WIDTH, this.canvas.height]
+    //   // console.log('begin', begin, 'end', end)
+    //   this.ctx.moveTo(begin[0], begin[1])
+    //   this.ctx.lineTo(end[0], end[1])
+    // }
+    // for (let y = 0; y <= this.height; y++) {
+    //   begin = [0, y * REAL_BLOCK_WIDTH]
+    //   end = [this.canvas.width, y * REAL_BLOCK_WIDTH]
+    //   this.ctx.moveTo(begin[0], begin[1])
+    //   this.ctx.lineTo(end[0], end[1])
+    // }
+    // this.ctx.stroke()
 
 
     for (let x = 0; x < this.width; x++) {

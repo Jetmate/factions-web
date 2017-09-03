@@ -1,12 +1,11 @@
 export const
-  GRID_WIDTH = window.GRID_WIDTH,
-  GRID_HEIGHT = window.GRID_HEIGHT,
   SCALE_FACTOR = 3,
   REAL_BLOCK_WIDTH = 16,
   BLOCK_WIDTH = REAL_BLOCK_WIDTH * SCALE_FACTOR,
   BLOCK_SIZE = [BLOCK_WIDTH, BLOCK_WIDTH],
-  WIDTH = GRID_WIDTH * BLOCK_WIDTH,
-  HEIGHT = GRID_HEIGHT * BLOCK_WIDTH,
+
+  WIDTH = (typeof window !== 'undefined') ? window.GRID_HEIGHT * BLOCK_WIDTH : null,
+  HEIGHT = (typeof window !== 'undefined') ? window.GRID_WIDTH * BLOCK_WIDTH : null,
 
   UPDATE_WAIT = 33,
 
@@ -26,7 +25,7 @@ export const
   ELEMENT_OUTLINE_COLOR = '#bababa',
   ELEMENT_BACKGROUND_COLOR = '#e0e0e0',
   ELEMENT_OFFSET = 25,
-  GUI_PADDING = [50, 50],
+  GUI_MARGIN = 50,
 
   HEALTH_BAR_SIZE = [100, 300],
   HEALTH_BAR_COLOR = '#96858f',

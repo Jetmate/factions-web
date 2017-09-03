@@ -1,5 +1,5 @@
 import React from 'react'
-import style from '../stylesheet.css'
+import style from './stylesheet.css.js'
 
 import { HEALTH_BAR_SIZE, BULLET_BAR_SIZE, MINIMAP_SIZE } from './constants.js'
 import HealthBar from './component/HealthBar.jsx'

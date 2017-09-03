@@ -35,13 +35,18 @@ module.exports = {
           }
         ]
       },
-      // {
-      //   test: /\.css\.js$/,
-      //   loader: 'css-js-loader'
-      // },
       {
-        test: /\.js?/,
+        test: /\.css\.js$/,
+        use: [
+          {
+            loader: 'css-in-js-loader'
+          }
+        ]
+      },
+      {
+        test: /\.(js|jsx)$/,
         include: APP_DIR,
+        enforce: 'pre',
         loader: 'babel-loader',
         options: {
           'presets': ['env', 'stage-0', 'react']
