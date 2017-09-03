@@ -1,10 +1,11 @@
-import { GUI_MARGIN, ELEMENT_OFFSET, ELEMENT_BACKGROUND_COLOR, ELEMENT_OUTLINE_COLOR, SCALE_FACTOR } from './constants.js'
+import { GUI_MARGIN, ELEMENT_OFFSET, ELEMENT_BACKGROUND_COLOR, ELEMENT_OUTLINE_COLOR, SCALE_FACTOR, BLOCK_COLOR } from './constants.js'
 
 export default {
   '.game': {
     'position': 'absolute',
     'top': 0,
-    'z-index': -1
+    'z-index': -1,
+    'background-color': BLOCK_COLOR
   },
 
   '.gui': {

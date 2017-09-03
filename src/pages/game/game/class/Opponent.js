@@ -1,6 +1,7 @@
 import { HEALTH_BAR2_OFFSET, HEALTH_BAR2_SIZE, PLAYER_HEALTH } from '../constants.js'
 import HealthBar from './gui/HealthBarMoving.js'
 import Thing from './Thing.js'
+import { findCenter } from '../helpers.js'
 
 export default class Opponent extends Thing {
   constructor (coords, spriteManager, health) {
@@ -10,6 +11,9 @@ export default class Opponent extends Thing {
     this.initialHealth = PLAYER_HEALTH
     this.healthBar = new HealthBar(HEALTH_BAR2_SIZE, 0)
     this.healthBar.changeHealth(this.health / this.initialHealth)
+
+    this.xOffset = findCenter(this.size, this.healthBar.size)[0]
+    console.log(this.size, this.healthBar.size)
   }
 
   processChange (changeType, value) {
@@ -36,6 +40,6 @@ export default class Opponent extends Thing {
   draw (ctx, coordsFunc) {
     let [x, y] = coordsFunc(this.coords)
     ctx.drawImage(this.spriteManager.currentSprite(), x, y)
-    this.healthBar.draw(ctx, [x, y + HEALTH_BAR2_OFFSET])
+    this.healthBar.draw(ctx, [x + this.xOffset, y + HEALTH_BAR2_OFFSET])
   }
 }

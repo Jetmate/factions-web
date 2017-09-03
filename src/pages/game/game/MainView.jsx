@@ -11,7 +11,7 @@ import Grid from './class/Grid.js'
 import { rifle } from './guns.js'
 
 import { convertFromGrid } from './helpers.js'
-import { SCALE_FACTOR, UPDATE_WAIT, KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN, PLAYER_HEALTH, BLOCK_COLOR, FONT } from './constants.js'
+import { SCALE_FACTOR, UPDATE_WAIT, KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN, PLAYER_HEALTH, FONT } from './constants.js'
 
 
 class Component extends React.Component {
@@ -211,8 +211,7 @@ function main (grid, player, opponents, bullets) {
 }
 
 function draw (ctx, grid, player, opponents, bullets) {
-  ctx.fillStyle = BLOCK_COLOR
-  ctx.fillRect(0, 0, window.innerWidth, window.innerHeight)
+  ctx.clearRect(0, 0, window.innerWidth, window.innerHeight)
 
   grid.draw(ctx, player.generateDisplayCoords)
   for (let id in bullets) {
