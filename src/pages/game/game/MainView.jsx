@@ -2,8 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import SpriteSheet from './class/SpriteSheet.js'
-import SpriteManager from './class/SpriteManager.js'
-import SpriteManagerRotation from './class/SpriteManagerRotation.js'
+import SpriteManager from './class/SpriteManagerRotation.js'
 import Player from './class/Player.js'
 import Opponent from './class/Opponent.js'
 import BulletOpponent from './class/BulletOpponent.js'
@@ -23,14 +22,16 @@ class Component extends React.Component {
   }
 
   initCanvas = (canvas) => {
-    canvas.width = CANVAS_WIDTH
-    canvas.height = CANVAS_HEIGHT
-    canvas.oncontextmenu = (e) => {
-      e.preventDefault()
+    if (canvas) {
+      canvas.width = CANVAS_WIDTH
+      canvas.height = CANVAS_HEIGHT
+      canvas.oncontextmenu = (e) => {
+        e.preventDefault()
+      }
+      let ctx = canvas.getContext('2d')
+      ctx.font = FONT
+      init(ctx, this.props.socket, this.props.dispatch)
     }
-    let ctx = canvas.getContext('2d')
-    ctx.font = FONT
-    init(ctx, this.props.socket, this.props.dispatch)
   }
 }
 
@@ -50,7 +51,7 @@ function init (ctx, socket, reduxDispatch) {
 
     let player = new Player(
       convertFromGrid(JSON.parse(window.coords)),
-      new SpriteManagerRotation(playerSprite),
+      new SpriteManager(playerSprite),
       ctx.canvas.style,
       reduxDispatch,
       socket,
@@ -60,7 +61,7 @@ function init (ctx, socket, reduxDispatch) {
       rifle
     )
 
-    socket.emit('new', window.id, player.coords)
+    socket.emit('newPlayer', window.id, player.coords)
 
     let grid = new Grid(JSON.parse(window.grid), blockSprite)
     let opponents = {}

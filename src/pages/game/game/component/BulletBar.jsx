@@ -10,7 +10,6 @@ class Component extends GuiComponent {
   }
 
   componentWillReceiveProps (nextProps) {
-    console.log('bar', nextProps)
     if (nextProps.ammoCapacity !== this.props.ammoCapacity) {
       this.object.setAmmoCapacity(nextProps.ammoCapacity)
     } else {

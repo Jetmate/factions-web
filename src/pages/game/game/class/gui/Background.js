@@ -10,6 +10,6 @@ export default class Element {
     ctx.fillStyle = ELEMENT_OUTLINE_COLOR
     ctx.fillRect(0, 0, outerSize[0], outerSize[1])
     ctx.fillStyle = ELEMENT_BACKGROUND_COLOR
-    ctx.fillRect(SCALE_FACTOR, SCALE_FACTOR, this.size[0], this.size[1])
+    ctx.fillRect(SCALE_FACTOR, SCALE_FACTOR, size[0], size[1])
   }
 }

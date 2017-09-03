@@ -17,8 +17,10 @@ export default class GuiComponent extends React.Component {
   }
 
   initCanvas = (canvas) => {
-    canvas.width = this.props.size[0]
-    canvas.height = this.props.size[1]
-    this.ctx = canvas.getContext('2d')
+    if (canvas) {
+      canvas.width = this.props.size[0]
+      canvas.height = this.props.size[1]
+      this.ctx = canvas.getContext('2d')
+    }
   }
 }

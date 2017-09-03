@@ -40,7 +40,7 @@ module.exports = {
       //   loader: 'css-js-loader'
       // },
       {
-        test: /\.js$/,
+        test: /\.js?/,
         include: APP_DIR,
         loader: 'babel-loader',
         options: {
