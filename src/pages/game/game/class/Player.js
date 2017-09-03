@@ -1,5 +1,5 @@
 import { findCenter, generateId, checkCollision, hypotenuse, findAllGridCoords, convertFromGrid } from '../helpers.js'
-import { BLOCK_SIZE, CANVAS_WIDTH, CANVAS_HEIGHT, CENTER, PLAYER_SPEED, CURSOR_AIMING, CURSOR_RELOADING } from '../constants.js'
+import { BLOCK_SIZE, PLAYER_SPEED, CURSOR_AIMING, CURSOR_RELOADING } from '../constants.js'
 import SpriteManager from './SpriteManagerRotation.js'
 import { changeCoords, setAmmoCapacity, changeHealth, changeAmmo } from '../../../../redux/actions.js'
 
@@ -10,7 +10,10 @@ export default class Player {
     this.canvasStyle = canvasStyle
     canvasStyle.cursor = CURSOR_AIMING
     this.coords = findCenter(BLOCK_SIZE, this.size, coords)
-    this.fakeCoords = findCenter([CANVAS_WIDTH, CANVAS_HEIGHT], this.size)
+    this.fakeCoords = findCenter([window.innerWidth, window.innerHeight], this.size)
+    window.addEventListener('resize', () => {
+      this.fakeCoords = findCenter([window.innerWidth, window.innerHeight], this.size)
+    })
     this.fakeCoords[0] = this.fakeCoords[0] >> 0
     this.fakeCoords[1] = this.fakeCoords[1] >> 0
     this.rotation = 0
@@ -85,7 +88,7 @@ export default class Player {
   }
 
   rotate (cursorX, cursorY) {
-    let cursorDiff = [cursorX - CENTER[0], cursorY - CENTER[1]]
+    let cursorDiff = [cursorX - window.innerWidth / 2, cursorY - window.innerHeight / 2]
     this.rotation = Math.atan(cursorDiff[1] / cursorDiff[0]) + -1.5708
 
     if (cursorDiff[0] < 0) {
@@ -170,8 +173,8 @@ export default class Player {
       //   (cursorY - bulletSpriteManager.sprite.height / 2) - (CENTER[1] + offset[1])
       // ]
       let difference = [
-        (cursorX - bulletSpriteManager.canvas.width / 2) - (CENTER[0] + offset[0]),
-        (cursorY - bulletSpriteManager.canvas.height / 2) - (CENTER[1] + offset[1])
+        (cursorX - bulletSpriteManager.canvas.width / 2) - (window.innerWidth / 2 + offset[0]),
+        (cursorY - bulletSpriteManager.canvas.height / 2) - (window.innerHeight / 2 + offset[1])
       ]
       let center = [
         this.coords[0] + this.size[0] / 2,
