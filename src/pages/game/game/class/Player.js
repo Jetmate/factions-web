@@ -173,8 +173,8 @@ export default class Player {
       //   (cursorY - bulletSpriteManager.sprite.height / 2) - (CENTER[1] + offset[1])
       // ]
       let difference = [
-        (cursorX - bulletSpriteManager.canvas.width / 2) - (window.innerWidth / 2 + offset[0]),
-        (cursorY - bulletSpriteManager.canvas.height / 2) - (window.innerHeight / 2 + offset[1])
+        (cursorX - this.bulletSprite.width / 2) - (window.innerWidth / 2 + offset[0]),
+        (cursorY - this.bulletSprite.height / 2) - (window.innerHeight / 2 + offset[1])
       ]
       let center = [
         this.coords[0] + this.size[0] / 2,
