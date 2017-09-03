@@ -4,11 +4,10 @@ import SpriteManager from './SpriteManagerRotation.js'
 import { changeCoords, setAmmoCapacity, changeHealth, changeAmmo } from '../../../../redux/actions.js'
 
 export default class Player {
-  constructor (coords, spriteManager, canvasStyle, reduxDispatch, socket, bulletSprite, bulletStart, health, currentGun) {
+  constructor (coords, spriteManager, reduxDispatch, socket, bulletSprite, bulletStart, health, currentGun) {
     this.spriteManager = spriteManager
     this.size = [this.spriteManager.canvas.width, this.spriteManager.canvas.height]
-    this.canvasStyle = canvasStyle
-    canvasStyle.cursor = CURSOR_AIMING
+    document.body.style.cursor = CURSOR_AIMING
     this.coords = findCenter(BLOCK_SIZE, this.size, coords)
     this.fakeCoords = findCenter([window.innerWidth, window.innerHeight], this.size)
     window.addEventListener('resize', () => {
@@ -168,10 +167,6 @@ export default class Player {
         Math.cos(this.rotation) * this.bulletStartDiff,
         Math.sin(this.rotation) * this.bulletStartDiff
       ]
-      // let difference = [
-      //   (cursorX - bulletSpriteManager.sprite.width / 2) - (CENTER[0] + offset[0]),
-      //   (cursorY - bulletSpriteManager.sprite.height / 2) - (CENTER[1] + offset[1])
-      // ]
       let difference = [
         (cursorX - this.bulletSprite.width / 2) - (window.innerWidth / 2 + offset[0]),
         (cursorY - this.bulletSprite.height / 2) - (window.innerHeight / 2 + offset[1])
@@ -181,10 +176,6 @@ export default class Player {
         this.coords[1] + this.size[1] / 2
       ]
       let bullet = new this.currentGun.Bullet(
-        // [
-        //   center[0] + offset[0] - bulletSpriteManager.size[0] / 2,
-        //   center[1] + offset[1] - bulletSpriteManager.size[1] / 2
-        // ],
         [
           center[0] + offset[0] - bulletSpriteManager.canvas.width / 2,
           center[1] + offset[1] - bulletSpriteManager.canvas.height / 2
@@ -201,18 +192,18 @@ export default class Player {
       this.socket.emit('newBullet', bullet.coords, bullet.id, this.rotation, bullet.velocity)
     } else if (!this.reloading) {
       this.reloading = true
-      this.canvasStyle.cursor = CURSOR_RELOADING[0]
+      document.body.style.cursor = CURSOR_RELOADING[0]
       let cursorFrame = 0
       let interval = window.setInterval(() => {
         if (cursorFrame === CURSOR_RELOADING.length) {
           window.clearInterval(interval)
           this.ammo = this.currentGun.ammo
           this.reduxDispatch(changeAmmo(this.ammo))
-          this.canvasStyle.cursor = CURSOR_AIMING
+          document.body.style.cursor = CURSOR_AIMING
           this.reloading = false
         } else {
           cursorFrame++
-          this.canvasStyle.cursor = CURSOR_RELOADING[cursorFrame]
+          document.body.style.cursor = CURSOR_RELOADING[cursorFrame]
         }
       }, this.currentGun.reloadTime / CURSOR_RELOADING.length)
     }

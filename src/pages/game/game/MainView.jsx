@@ -56,7 +56,6 @@ function init (ctx, socket, reduxDispatch) {
     let player = new Player(
       convertFromGrid(JSON.parse(window.coords)),
       new SpriteManager(playerSprite),
-      ctx.canvas.style,
       reduxDispatch,
       socket,
       bulletSprite,
