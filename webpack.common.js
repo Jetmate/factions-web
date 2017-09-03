@@ -14,7 +14,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.css$/,
+        test: /\.css(\.js)?$/,
         use: [
           {
             loader: 'style-loader'
@@ -35,8 +35,12 @@ module.exports = {
           }
         ]
       },
+      // {
+      //   test: /\.css\.js$/,
+      //   loader: 'css-js-loader'
+      // },
       {
-        test: /\.js?/,
+        test: /\.js$/,
         include: APP_DIR,
         loader: 'babel-loader',
         options: {

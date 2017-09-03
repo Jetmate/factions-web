@@ -1,4 +1,5 @@
 import React from 'react'
+import style from '../stylesheet.css'
 
 import { HEALTH_BAR_SIZE, BULLET_BAR_SIZE, MINIMAP_SIZE } from './constants.js'
 import HealthBar from './component/HealthBar.jsx'
@@ -10,10 +11,12 @@ class Component extends React.Component {
   render () {
     return (
       <div>
-        <HealthBar size={HEALTH_BAR_SIZE} />
-        <BulletBar size={BULLET_BAR_SIZE} />
-        <MiniMap size={MINIMAP_SIZE} />
-        <MainView socket={this.props.socket} />
+        <div className={style.gui}>
+          <HealthBar size={HEALTH_BAR_SIZE} />
+          <BulletBar size={BULLET_BAR_SIZE} />
+          <MiniMap size={MINIMAP_SIZE} />
+        </div>
+        <MainView className={style.game} socket={this.props.socket} />
       </div>
     )
   }

@@ -26,6 +26,7 @@ export default class Player {
 
     reduxDispatch(changeCoords(this.coords))
     reduxDispatch(setAmmoCapacity(this.currentGun.ammo))
+    reduxDispatch(changeHealth(this.health))
   }
 
   move (direction) {

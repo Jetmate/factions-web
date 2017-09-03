@@ -1,4 +1,11 @@
-export default function reducer (state = {}, action) {
+const initialState = {
+  coords: [0, 0],
+  ammoCapacity: 0,
+  health: 0,
+  ammo: 0
+}
+
+export default function reducer (state = initialState, action) {
   switch (action.type) {
     case 'CHANGE_COORDS':
       return {...state, coords: action.payload}

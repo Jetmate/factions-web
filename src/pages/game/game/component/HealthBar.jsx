@@ -10,6 +10,7 @@ class Component extends GuiComponent {
   }
 
   componentWillReceiveProps (nextProps) {
+    console.log(nextProps)
     this.object.changeHealth(nextProps.health)
     super.componentWillReceiveProps()
   }

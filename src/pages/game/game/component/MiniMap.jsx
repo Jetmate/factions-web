@@ -17,7 +17,7 @@ class Component extends GuiComponent {
 
 function mapStateToProps (state) {
   return {
-    coords: state.coords
+    coords: state.coords.slice()
   }
 }
 

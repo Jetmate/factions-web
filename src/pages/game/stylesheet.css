@@ -1,10 +1,21 @@
-.Game {
-
-  /* width: 100%; */
-  /* position: absolute;
-  margin: auto;
+.game {
+  position: absolute;
   top: 0;
-  bottom: 0;
-  right: 0;
-  left: 0; */
+  z-index: -1;
+}
+
+.gui {
+  margin: 50px;
+}
+
+.gui * {
+  position: relative;
+  margin-bottom: 25px;
+  background-color: #e0e0e0;
+  border: 3px solid #bababa;
+  display: block;
+}
+
+.right {
+  float: right;
 }

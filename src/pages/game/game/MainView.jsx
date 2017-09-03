@@ -18,7 +18,7 @@ import { SCALE_FACTOR, CANVAS_WIDTH, CANVAS_HEIGHT, UPDATE_WAIT, KEY_RIGHT, KEY_
 class Component extends React.Component {
   render () {
     return (
-      <canvas ref={this.initCanvas}>Looks like your browser does not support the JS canvas. yikes.</canvas>
+      <canvas className={this.props.className} ref={this.initCanvas}>Looks like your browser does not support the JS canvas. yikes.</canvas>
     )
   }
 

@@ -18,7 +18,7 @@ export default class SpriteManager {
     this.ctx.imageSmoothingEnabled = false
     this.ctx.webkitImageSmoothingEnabled = false
     this.ctx.mozImageSmoothingEnabled = false
-    this.ctx.drawImage(this.sprite, 0, 0)
+    this.rotate(0)
   }
 
   rotate (rotation) {
