@@ -1,4 +1,4 @@
-import { SCALE_FACTOR } from './constants.js'
+import { SCALE_FACTOR } from '../constants.js'
 
 export default class SpriteManager {
   constructor (sprite) {

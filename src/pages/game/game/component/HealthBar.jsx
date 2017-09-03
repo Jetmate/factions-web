@@ -1,25 +1,24 @@
-import React from 'react'
+import { connect } from 'react-redux'
 
-import { HEALTH_BAR_SIZE } from '../constants.js'
-import HealthBar from '../class/HealthBar.js'
+import GuiComponent from './GuiComponent.jsx'
+import HealthBar from '../class/gui/HealthBar.js'
 
-export default class Component extends React.Component {
+class Component extends GuiComponent {
+  constructor (props) {
+    super(props)
+    this.object = new HealthBar(this.props.size, 1)
+  }
+
   componentWillReceiveProps (nextProps) {
-    this.healthBar.changeHealth(nextProps.health)
-    this.healthBar.draw(this.ctx)
-  }
-
-  shouldComponentUpdate (nextProps, nextState) {
-    return false
-  }
-
-  render () {
-    return (
-      <canvas ref={this.initCanvas}></canvas>
-    )
-  }
-
-  initCanvas (canvas) {
-    this.healthBar = new HealthBar(HEALTH_BAR_SIZE, 1, canvas)
+    this.object.changeHealth(nextProps.health)
+    super.componentWillReceiveProps()
   }
 }
+
+function mapStateToProps (state) {
+  return {
+    health: state.health
+  }
+}
+
+export default connect(mapStateToProps)(Component)

@@ -1,35 +1,25 @@
-import React from 'react'
 import { connect } from 'react-redux'
 
-import { BULLET_BAR_SIZE } from '../constants.js'
-import BulletBar from '../class/BulletBar.js'
+import GuiComponent from './GuiComponent.jsx'
+import BulletBar from '../class/gui/BulletBar.js'
 
-class Component extends React.Component {
+class Component extends GuiComponent {
+  constructor (props) {
+    super(props)
+    this.object = new BulletBar(this.props.size, 1)
+  }
+
   componentWillReceiveProps (nextProps) {
-    if (nextProps.ammoCapacity != this.props.ammoCapacity) {
-      this.bulletBar.setAmmoCapacity(nextProps.ammoCapacity)
+    if (nextProps.ammoCapacity !== this.props.ammoCapacity) {
+      this.object.setAmmoCapacity(nextProps.ammoCapacity)
     } else {
-      this.bulletBar.changeAmmo(nextProps.ammo)
+      this.object.changeAmmo(nextProps.ammo)
     }
-    this.bulletBar.draw(this.ctx)
-  }
-
-  shouldComponentUpdate (nextProps, nextState) {
-    return false
-  }
-
-  render () {
-    return (
-      <canvas ref={this.initCanvas}></canvas>
-    )
-  }
-
-  initCanvas (canvas) {
-    this.bulletBar = new BulletBar(BULLET_BAR_SIZE, 1, canvas)
+    super.componentWillReceiveProps()
   }
 }
 
-const mapStateToProps = (state) => {
+function mapStateToProps (state) {
   return {
     ammoCapacity: state.ammoCapacity,
     ammo: state.ammo

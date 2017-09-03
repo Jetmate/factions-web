@@ -1,6 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { Provider } from 'react-redux'
 
+import store from './redux/store.js'
 import './normalize.css'
 import './index.css'
 import Setup from './pages/setup/index.jsx'
@@ -21,6 +23,8 @@ switch (window.component) {
 }
 
 ReactDOM.render(
-  <Component />,
+  <Provider store={store}>
+    <Component />
+  </Provider>,
   document.getElementById('app')
 )

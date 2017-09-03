@@ -1,35 +1,24 @@
-import React from 'react'
 import { connect } from 'react-redux'
 
-import { MINI_MAP_SIZE } from '../constants.js'
-import MiniMap from '../class/MiniMap.js'
+import GuiComponent from './GuiComponent.jsx'
+import MiniMap from '../class/gui/MiniMap.js'
 
-export default class Component extends React.Component {
+class Component extends GuiComponent {
+  constructor (props) {
+    super(props)
+    this.object = new MiniMap(this.props.size, 1)
+  }
+
   componentWillReceiveProps (nextProps) {
-    this.miniMap.changeMarkerCoords(nextProps.coords)
-    this.miniMap.draw(this.ctx)
-  }
-
-  shouldComponentUpdate (nextProps, nextState) {
-    return false
-  }
-
-  render () {
-    return (
-      <canvas ref={this.initCanvas}></canvas>
-    )
-  }
-
-  initCanvas (canvas) {
-    this.miniMap = new MiniMap(HEALTH_BAR_SIZE, 1, canvas)
+    this.object.changeMarkerCoords(nextProps.coords)
+    super.componentWillReceiveProps()
   }
 }
 
-const mapStateToProps = (state) => {
+function mapStateToProps (state) {
   return {
-    currentUser: state.currentUser,
-    createPostLocation: state.createPostLocation
+    coords: state.coords
   }
 }
 
-export default connect(mapStateToProps)(PostDialog)
+export default connect(mapStateToProps)(Component)

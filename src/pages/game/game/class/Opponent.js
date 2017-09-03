@@ -1,5 +1,5 @@
-import { HEALTH_BAR2_OFFSET, HEALTH_BAR2_SIZE, PLAYER_HEALTH } from './constants.js'
-import HealthBar from './HealthBar.js'
+import { HEALTH_BAR2_OFFSET, HEALTH_BAR2_SIZE, PLAYER_HEALTH } from '../constants.js'
+import HealthBar from './gui/HealthBarMoving.js'
 import Thing from './Thing.js'
 
 export default class Opponent extends Thing {

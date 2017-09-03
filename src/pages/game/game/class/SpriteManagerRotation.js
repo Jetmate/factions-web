@@ -1,5 +1,5 @@
-import { findCenter, hypotenuse } from './helpers.js'
-import { SCALE_FACTOR } from './constants.js'
+import { findCenter, hypotenuse } from '../helpers.js'
+import { SCALE_FACTOR } from '../constants.js'
 
 export default class SpriteManager {
   constructor (sprite) {

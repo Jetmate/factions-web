@@ -1,8 +1,8 @@
-import Bullet from './Bullet.js'
+import BulletPlayer from './class/BulletPlayer.js'
 
 export const
   rifle = {
-    Bullet: Bullet,
+    Bullet: BulletPlayer,
     ammo: 10,
     speed: 30,
     reloadTime: 2000

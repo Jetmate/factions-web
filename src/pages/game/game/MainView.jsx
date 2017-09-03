@@ -1,31 +1,28 @@
 import React from 'react'
+import { connect } from 'react-redux'
 
-import SpriteSheet from './SpriteSheet.js'
-import SpriteManager from './SpriteManager.js'
-import Player from './Player.js'
-import Opponent from './Opponent.js'
-import Bullet from './Bullet.js'
-import Grid from './Grid.js'
-import Gui from './Gui.js'
-import HealthBar from './HealthBar.js'
-import MiniMap from './MiniMap.js'
-import BulletBar from './BulletBar.js'
-// import Leaderboard from './Leaderboard.js'
+import SpriteSheet from './class/SpriteSheet.js'
+import SpriteManager from './class/SpriteManager.js'
+import SpriteManagerRotation from './class/SpriteManagerRotation.js'
+import Player from './class/Player.js'
+import Opponent from './class/Opponent.js'
+import BulletOpponent from './class/BulletOpponent.js'
+import Grid from './class/Grid.js'
 
 import { rifle } from './guns.js'
 
 import { convertFromGrid } from './helpers.js'
-import { SCALE_FACTOR, CANVAS_WIDTH, CANVAS_HEIGHT, UPDATE_WAIT, KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN, PLAYER_HEALTH, BLOCK_COLOR, HEALTH_BAR_SIZE, ELEMENT_OFFSET, MINIMAP_SIZE, BULLET_BAR_SIZE, LEADERBOARD_SIZE, FONT } from './constants.js'
+import { SCALE_FACTOR, CANVAS_WIDTH, CANVAS_HEIGHT, UPDATE_WAIT, KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN, PLAYER_HEALTH, BLOCK_COLOR, FONT } from './constants.js'
 
 
-export default class Component extends React.Component {
+class Component extends React.Component {
   render () {
     return (
       <canvas ref={this.initCanvas}>Looks like your browser does not support the JS canvas. yikes.</canvas>
     )
   }
 
-  initCanvas (canvas) {
+  initCanvas = (canvas) => {
     canvas.width = CANVAS_WIDTH
     canvas.height = CANVAS_HEIGHT
     canvas.oncontextmenu = (e) => {
@@ -33,12 +30,14 @@ export default class Component extends React.Component {
     }
     let ctx = canvas.getContext('2d')
     ctx.font = FONT
-    init(ctx, this.props.socket)
+    init(ctx, this.props.socket, this.props.dispatch)
   }
 }
 
+export default connect()(Component)
 
-function init (ctx, socket) {
+
+function init (ctx, socket, reduxDispatch) {
   const spriteSheetImage = new Image()
   spriteSheetImage.src = 'media/spritesheet.png'
 
@@ -49,24 +48,16 @@ function init (ctx, socket) {
     const bulletSprite = spriteSheet.getSprite(3, 4, true)
     const blockSprite = spriteSheet.getSprite(16, 16, true)
 
-    let gui = new Gui()
-    let healthBar = gui.addElement(new HealthBar(HEALTH_BAR_SIZE, 1), ELEMENT_OFFSET, 0)
-    let bulletBar = gui.addElement(new BulletBar(BULLET_BAR_SIZE, 1), ELEMENT_OFFSET, 0)
-    let miniMap = gui.addElement(new MiniMap(MINIMAP_SIZE), ELEMENT_OFFSET, 0)
-    // let leaderboard = gui.addElement(new Leaderboard(LEADERBOARD_SIZE), ELEMENT_OFFSET, 1)
-
     let player = new Player(
-      ctx.canvas.style,
       convertFromGrid(JSON.parse(window.coords)),
-      new SpriteManager(playerSprite),
+      new SpriteManagerRotation(playerSprite),
+      ctx.canvas.style,
+      reduxDispatch,
       socket,
       bulletSprite,
       bulletStart,
       PLAYER_HEALTH,
-      rifle,
-      healthBar,
-      miniMap,
-      bulletBar
+      rifle
     )
 
     socket.emit('new', window.id, player.coords)
@@ -75,7 +66,7 @@ function init (ctx, socket) {
     let opponents = {}
     let bullets = {}
 
-    initSocket(socket, player, opponents, bullets)
+    initSocket(socket, player, opponents, bullets, bulletSprite, playerSprite)
     initInput(player)
 
 
@@ -100,9 +91,9 @@ function init (ctx, socket) {
   }
 }
 
-function initSocket(socket, player, opponents, bullets) {
-  socket.on('newBullet', (id, coords, rotation, velocity) => {
-    bullets[id] = new Bullet(id, coords, new SpriteManager(bulletSprite), rotation, velocity)
+function initSocket (socket, player, opponents, bullets, bulletSprite, playerSprite) {
+  socket.on('newBullet', (coords, id, rotation, velocity) => {
+    bullets[id] = new BulletOpponent(coords, new SpriteManager(bulletSprite), id, rotation, velocity)
   })
 
   socket.on('bulletCrash', (id) => {

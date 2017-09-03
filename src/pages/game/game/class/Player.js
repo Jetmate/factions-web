@@ -1,29 +1,31 @@
-import { findCenter, generateId, checkCollision, hypotenuse, findAllGridCoords, convertFromGrid } from './helpers.js'
-import { BLOCK_SIZE, CANVAS_WIDTH, CANVAS_HEIGHT, CENTER, PLAYER_SPEED, CURSOR_AIMING, CURSOR_RELOADING } from './constants.js'
-import SpriteManager from './SpriteManager.js'
-import { changePlayerCoords, setAmmoCapacity, changeHealth, changeAmmo } from '../../../../redux/'
+import { findCenter, generateId, checkCollision, hypotenuse, findAllGridCoords, convertFromGrid } from '../helpers.js'
+import { BLOCK_SIZE, CANVAS_WIDTH, CANVAS_HEIGHT, CENTER, PLAYER_SPEED, CURSOR_AIMING, CURSOR_RELOADING } from '../constants.js'
+import SpriteManager from './SpriteManagerRotation.js'
+import { changeCoords, setAmmoCapacity, changeHealth, changeAmmo } from '../../../../redux/actions.js'
 
 export default class Player {
-  constructor (coords, spriteManager, canvasStyle, socket, bulletSprite, bulletStart, health, currentGun) {
+  constructor (coords, spriteManager, canvasStyle, reduxDispatch, socket, bulletSprite, bulletStart, health, currentGun) {
     this.spriteManager = spriteManager
+    this.size = [this.spriteManager.canvas.width, this.spriteManager.canvas.height]
     this.canvasStyle = canvasStyle
     canvasStyle.cursor = CURSOR_AIMING
-    this.coords = findCenter(BLOCK_SIZE, this.spriteManager.size, coords)
-    this.fakeCoords = findCenter([CANVAS_WIDTH, CANVAS_HEIGHT], this.spriteManager.size)
+    this.coords = findCenter(BLOCK_SIZE, this.size, coords)
+    this.fakeCoords = findCenter([CANVAS_WIDTH, CANVAS_HEIGHT], this.size)
     this.fakeCoords[0] = this.fakeCoords[0] >> 0
     this.fakeCoords[1] = this.fakeCoords[1] >> 0
     this.rotation = 0
     this.reset()
     this.socket = socket
+    this.reduxDispatch = reduxDispatch
     this.bulletSprite = bulletSprite
     this.bullets = []
-    this.bulletStartDiff = hypotenuse([bulletStart[0] - this.spriteManager.size[0] / 2, bulletStart[1] - this.spriteManager.size[1] / 2])
+    this.bulletStartDiff = hypotenuse([bulletStart[0] - this.size[0] / 2, bulletStart[1] - this.size[1] / 2])
     this.health = this.initialHealth = health
     this.currentGun = currentGun
     this.ammo = currentGun.ammo
 
-    changePlayerCoords(this.coords)
-    setAmmoCapacity(this.currentGun.ammo)
+    reduxDispatch(changeCoords(this.coords))
+    reduxDispatch(setAmmoCapacity(this.currentGun.ammo))
   }
 
   move (direction) {
@@ -108,7 +110,7 @@ export default class Player {
       if (this.velocity[i] !== 0) {
         let newCoords = this.coords.slice()
         newCoords[i] += this.velocity[i]
-        if (checkCollision(newCoords, this.spriteManager.size, coords, size)) {
+        if (checkCollision(newCoords, this.size, coords, size)) {
           this.alignVelocity(coords, size, i)
         }
       }
@@ -117,7 +119,7 @@ export default class Player {
 
   alignVelocity (coords, size, i) {
     if (this.velocity[i] > 0) {
-      this.velocity[i] = coords[i] - (this.coords[i] + this.spriteManager.size[i])
+      this.velocity[i] = coords[i] - (this.coords[i] + this.size[i])
     } else {
       this.velocity[i] = (coords[i] + size[i]) - this.coords[i]
     }
@@ -129,7 +131,7 @@ export default class Player {
       return
     }
 
-    let allGridCoords = findAllGridCoords([this.coords[0] + this.velocity[0], this.coords[1] + this.velocity[1]], this.spriteManager.size)
+    let allGridCoords = findAllGridCoords([this.coords[0] + this.velocity[0], this.coords[1] + this.velocity[1]], this.size)
 
     let collided = []
     for (let [x, y] of allGridCoords) {
@@ -144,14 +146,14 @@ export default class Player {
       this.coords[1] += this.velocity[1]
 
       if (this.velocity[0] && this.velocity[1] && collided.length === 1) {
-        if (checkCollision(this.coords, this.spriteManager.size, collided[0], BLOCK_SIZE)) {
+        if (checkCollision(this.coords, this.size, collided[0], BLOCK_SIZE)) {
           this.alignVelocity(collided[0], BLOCK_SIZE, 0)
           this.coords[0] += this.velocity[0]
         }
       }
 
       this.socket.emit('playerChange', window.id, 'coords', this.coords)
-      this.miniMap.changePlayerCoords(this.coords)
+      this.reduxDispatch(changeCoords(this.coords))
     }
   }
 
@@ -162,29 +164,37 @@ export default class Player {
         Math.cos(this.rotation) * this.bulletStartDiff,
         Math.sin(this.rotation) * this.bulletStartDiff
       ]
+      // let difference = [
+      //   (cursorX - bulletSpriteManager.sprite.width / 2) - (CENTER[0] + offset[0]),
+      //   (cursorY - bulletSpriteManager.sprite.height / 2) - (CENTER[1] + offset[1])
+      // ]
       let difference = [
-        (cursorX - bulletSpriteManager.sprite.width / 2) - (CENTER[0] + offset[0]),
-        (cursorY - bulletSpriteManager.sprite.height / 2) - (CENTER[1] + offset[1])
+        (cursorX - bulletSpriteManager.canvas.width / 2) - (CENTER[0] + offset[0]),
+        (cursorY - bulletSpriteManager.canvas.height / 2) - (CENTER[1] + offset[1])
       ]
       let center = [
-        this.coords[0] + this.spriteManager.size[0] / 2,
-        this.coords[1] + this.spriteManager.size[1] / 2
+        this.coords[0] + this.size[0] / 2,
+        this.coords[1] + this.size[1] / 2
       ]
       let bullet = new this.currentGun.Bullet(
+        // [
+        //   center[0] + offset[0] - bulletSpriteManager.size[0] / 2,
+        //   center[1] + offset[1] - bulletSpriteManager.size[1] / 2
+        // ],
+        [
+          center[0] + offset[0] - bulletSpriteManager.canvas.width / 2,
+          center[1] + offset[1] - bulletSpriteManager.canvas.height / 2
+        ],
+        bulletSpriteManager,
         generateId(),
         this.rotation,
-        [
-          center[0] + offset[0] - bulletSpriteManager.size[0] / 2,
-          center[1] + offset[1] - bulletSpriteManager.size[1] / 2
-        ],
         difference,
-        bulletSpriteManager,
         this.currentGun.speed
       )
       this.bullets.push(bullet)
       this.ammo--
-      changeAmmo(this.ammo)
-      this.socket.emit('newBullet', bullet.id, id, rotation, coords, difference, speed this.rotation, bullet.coords, bullet.velocity)
+      this.reduxDispatch(changeAmmo(this.ammo))
+      this.socket.emit('newBullet', bullet.coords, bullet.id, this.rotation, bullet.velocity)
     } else if (!this.reloading) {
       this.reloading = true
       this.canvasStyle.cursor = CURSOR_RELOADING[0]
@@ -193,7 +203,7 @@ export default class Player {
         if (cursorFrame === CURSOR_RELOADING.length) {
           window.clearInterval(interval)
           this.ammo = this.currentGun.ammo
-          changeAmmo(this.ammo)
+          this.reduxDispatch(changeAmmo(this.ammo))
           this.canvasStyle.cursor = CURSOR_AIMING
           this.reloading = false
         } else {
@@ -209,7 +219,7 @@ export default class Player {
     for (let i = 0; i < this.bullets.length; i++) {
       this.bullets[i].move()
 
-      let allGridCoords = findAllGridCoords(this.bullets[i].coords, this.bullets[i].spriteManager.size)
+      let allGridCoords = findAllGridCoords(this.bullets[i].coords, this.bullets[i].size)
       let crashed = false
       for (let [x, y] of allGridCoords) {
         if (grid.grid[x][y] === 'block') {
@@ -222,7 +232,7 @@ export default class Player {
 
       if (!crashed) {
         for (let id in players) {
-          if (checkCollision(players[id].coords, players[id].spriteManager.size, this.bullets[i].coords, this.bullets[i].spriteManager.size)) {
+          if (checkCollision(players[id].coords, players[id].size, this.bullets[i].coords, this.bullets[i].size)) {
             this.socket.emit('bulletHit', this.bullets[i].id, id)
             if (players[id].takeDamage()) {
               this.socket.emit('playerDeath', id, window.id)
@@ -247,6 +257,6 @@ export default class Player {
 
   takeDamage () {
     this.health--
-    changeHealth(this.health / this.initialHealth)
+    this.reduxDispatch(changeHealth(this.health / this.initialHealth))
   }
 }

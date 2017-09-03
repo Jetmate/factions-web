@@ -1,4 +1,4 @@
-import { CANVAS_WIDTH, GUI_PADDING } from './constants.js'
+import { CANVAS_WIDTH, GUI_PADDING } from '../../constants.js'
 
 export default class Gui {
   grid = [GUI_PADDING[1], GUI_PADDING[1]]

@@ -1,6 +1,6 @@
-export function changePlayerCoords (coords) {
+export function changeCoords (coords) {
   return {
-    type: 'CHANGE_PLAYER_COORDS',
+    type: 'CHANGE_COORDS',
     payload: coords
   }
 }
