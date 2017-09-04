@@ -9,12 +9,24 @@
 body {
   font-family: Montserrat;
   background-color: #efefef;
+  font-weight: 500;
+}
+
+h1, h3 {
+  font-weight: 600;
 }
 
 :global .element {
   border: 3px solid #bababa;
   background-color: #e0e0e0;
   padding: 10px;
+}
+
+:global .error {
+  border: 3px solid #a66e6e;
+  background-color: #dfaeae;
+  padding: 0 10px;
+  margin-top: 10px;
 }
 
 input, button {
