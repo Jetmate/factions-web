@@ -12,7 +12,7 @@ export default {
     'margin': GUI_MARGIN
   },
 
-  '.gui *': {
+  '.gui > *': {
     'position': 'relative',
     'margin-bottom': ELEMENT_OFFSET,
     'background-color': ELEMENT_BACKGROUND_COLOR,

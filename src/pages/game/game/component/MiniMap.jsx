@@ -11,7 +11,7 @@ class Component extends GuiComponent {
 
   componentWillReceiveProps (nextProps) {
     this.object.changeMarkerCoords(nextProps.coords)
-    super.componentWillReceiveProps()
+    this.draw()
   }
 }
 

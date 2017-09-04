@@ -11,7 +11,7 @@ class Component extends GuiComponent {
 
   componentWillReceiveProps (nextProps) {
     this.object.changeHealth(nextProps.health)
-    super.componentWillReceiveProps()
+    this.draw()
   }
 }
 

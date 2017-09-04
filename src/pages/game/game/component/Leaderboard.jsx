@@ -1,35 +1,29 @@
-// import React from 'react'
-// import { connect } from 'react-redux'
+import React from 'react'
 
-// import { HEALTH_BAR_SIZE } from '../constants.js'
-// import HealthBar from '../class/HealthBar.js'
+export default class Component extends React.Component {
+  constructor (props) {
+    super(props)
 
-// class Component extends React.Component {
-//   componentWillReceiveProps (nextProps) {
-//     this.healthBar.changeHealth(nextProps.health)
-//     this.healthBar.draw(this.ctx)
-//   }
+    this.state = JSON.parse(window.leaderboard)
+    this.state[window.id] = 0
 
-//   shouldComponentUpdate (nextProps, nextState) {
-//     return false
-//   }
+    this.props.socket.on('playerDeath', (playerId, killerId) => {
+      delete this.state[playerId]
+      this.setState({[killerId]: this.state[killerId] + 1})
+    })
 
-//   render () {
-//     return (
-//       <canvas ref={this.initCanvas}></canvas>
-//     )
-//   }
+    this.props.socket.on('newPlayer', (id) => {
+      this.setState({[id]: 0})
+    })
+  }
 
-//   initCanvas (canvas) {
-//     this.healthBar = new HealthBar(HEALTH_BAR_SIZE, 1, canvas)
-//   }
-// }
-
-// const mapStateToProps = (state) => {
-//   return {
-//     currentUser: state.currentUser,
-//     createPostLocation: state.createPostLocation
-//   }
-// }
-
-// export default connect(mapStateToProps)(Component)
+  render () {
+    return (
+      <ul className={this.props.className}>
+        {Object.keys(this.state).map((id) =>
+          <li key={id}>{id} = {this.state[id]}</li>
+        )}
+      </ul>
+    )
+  }
+}

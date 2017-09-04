@@ -15,7 +15,7 @@ class Component extends GuiComponent {
     } else {
       this.object.changeAmmo(nextProps.ammo)
     }
-    super.componentWillReceiveProps()
+    this.draw()
   }
 }
 
