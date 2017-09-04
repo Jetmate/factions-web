@@ -21,6 +21,7 @@ export default {
   },
 
   '.right': {
-    'float': 'right'
+    'float': 'right',
+    'clear': 'both'
   }
 }
