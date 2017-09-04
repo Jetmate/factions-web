@@ -13,7 +13,7 @@ class Component extends React.Component {
     return (
       <div>
         <div className={style.gui}>
-          <Leaderboard className={style.right} size={LEADERBOARD_SIZE} socket={this.props.socket} />
+          <Leaderboard className={style.right + ' ' + style.leaderboard} socket={this.props.socket} />
 
           <HealthBar size={HEALTH_BAR_SIZE} />
           <BulletBar size={BULLET_BAR_SIZE} />

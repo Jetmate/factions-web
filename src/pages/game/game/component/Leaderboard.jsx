@@ -15,6 +15,11 @@ export default class Component extends React.Component {
     this.props.socket.on('newPlayer', (id) => {
       this.setState({[id]: 0})
     })
+
+    this.props.socket.on('close', (id) => {
+      delete this.state[playerId]
+      this.forceUpdate()
+    })
   }
 
   render () {

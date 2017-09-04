@@ -11,7 +11,7 @@ import Grid from './class/Grid.js'
 import { rifle } from './guns.js'
 
 import { convertFromGrid } from './helpers.js'
-import { SCALE_FACTOR, UPDATE_WAIT, KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN, PLAYER_HEALTH, FONT } from './constants.js'
+import { SCALE_FACTOR, UPDATE_WAIT, KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN, PLAYER_HEALTH } from './constants.js'
 
 
 class Component extends React.Component {
@@ -33,7 +33,6 @@ class Component extends React.Component {
         canvas.height = window.innerHeight
       })
       let ctx = canvas.getContext('2d')
-      ctx.font = FONT
       init(ctx, this.props.socket, this.props.dispatch)
     }
   }
