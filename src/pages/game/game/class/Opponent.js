@@ -13,7 +13,6 @@ export default class Opponent extends Thing {
     this.healthBar.changeHealth(this.health / this.initialHealth)
 
     this.xOffset = findCenter(this.size, this.healthBar.size)[0]
-    console.log(this.size, this.healthBar.size)
   }
 
   processChange (changeType, value) {

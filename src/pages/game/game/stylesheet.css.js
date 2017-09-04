@@ -35,7 +35,12 @@ export default {
   },
 
   '.leaderboard :global .row': {
-    'padding-bottom': LEADERBOARD_ROW_PADDING,
+    'margin-bottom': LEADERBOARD_ROW_PADDING,
     'height': LEADERBOARD_ROW_HEIGHT
+  },
+
+  '.currentPlayer': {
+    'background-color': ELEMENT_OUTLINE_COLOR,
+    'padding': `${SCALE_FACTOR}px 0`
   }
 }

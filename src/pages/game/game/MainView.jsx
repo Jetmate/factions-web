@@ -33,6 +33,10 @@ class Component extends React.Component {
       init(ctx, this.props.socket, this.props.dispatch)
     }
   }
+
+  componentWillUnmount () {
+    console.log('UNMOUNTING')
+  }
 }
 
 export default connect()(Component)
@@ -149,6 +153,10 @@ function initSocket (socket, player, opponents, bullets, bulletSprite, playerSpr
   })
 
   socket.on('close', (id) => {
+    delete opponents[id]
+  })
+
+  socket.on('reload', (id) => {
     delete opponents[id]
   })
 }
