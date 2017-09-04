@@ -1,5 +1,5 @@
 import { findCenter, generateId, checkCollision, hypotenuse, findAllGridCoords, convertFromGrid } from '../helpers.js'
-import { BLOCK_SIZE, PLAYER_SPEED, CURSOR_AIMING, CURSOR_RELOADING } from '../constants.js'
+import { BLOCK_SIZE, PLAYER_SPEED, DIAGONAL_PLAYER_SPEED, CURSOR_AIMING, CURSOR_RELOADING } from '../constants.js'
 import SpriteManager from './SpriteManagerRotation.js'
 import { changeCoords, setAmmoCapacity, changeHealth, changeAmmo } from '../../../../redux/actions.js'
 
@@ -34,22 +34,22 @@ export default class Player {
   move (direction) {
     switch (direction) {
       case 'RIGHT': {
-        this.movement[0] = PLAYER_SPEED
+        this.movement[0] = 1
         this.directions['RIGHT'] = true
         break
       }
       case 'LEFT': {
-        this.movement[0] = -PLAYER_SPEED
+        this.movement[0] = -1
         this.directions['LEFT'] = true
         break
       }
       case 'UP': {
-        this.movement[1] = -PLAYER_SPEED
+        this.movement[1] = -1
         this.directions['UP'] = true
         break
       }
       case 'DOWN': {
-        this.movement[1] = PLAYER_SPEED
+        this.movement[1] = 1
         this.directions['DOWN'] = true
         break
       }
@@ -59,22 +59,22 @@ export default class Player {
   unmove (direction) {
     switch (direction) {
       case 'RIGHT': {
-        this.movement[0] = (this.directions['LEFT'] ? -PLAYER_SPEED : 0)
+        this.movement[0] = (this.directions['LEFT'] ? -1 : 0)
         this.directions['RIGHT'] = false
         break
       }
       case 'LEFT': {
-        this.movement[0] = (this.directions['RIGHT'] ? PLAYER_SPEED : 0)
+        this.movement[0] = (this.directions['RIGHT'] ? 1 : 0)
         this.directions['LEFT'] = false
         break
       }
       case 'UP': {
-        this.movement[1] = (this.directions['DOWN'] ? PLAYER_SPEED : 0)
+        this.movement[1] = (this.directions['DOWN'] ? 1 : 0)
         this.directions['UP'] = false
         break
       }
       case 'DOWN': {
-        this.movement[1] = (this.directions['UP'] ? -PLAYER_SPEED : 0)
+        this.movement[1] = (this.directions['UP'] ? -1 : 0)
         this.directions['DOWN'] = false
         break
       }
@@ -129,9 +129,12 @@ export default class Player {
   }
 
   execute (grid) {
-    this.velocity = this.movement.slice()
-    if (this.velocity[0] === 0 && this.velocity[1] === 0) {
+    if (!this.movement[0] && !this.movement[1]) {
       return
+    } else if (this.movement[0] && this.movement[1]) {
+      this.velocity = [this.movement[0] * DIAGONAL_PLAYER_SPEED, this.movement[1] * DIAGONAL_PLAYER_SPEED]
+    } else {
+      this.velocity = [this.movement[0] * PLAYER_SPEED, this.movement[1] * PLAYER_SPEED]
     }
 
     let allGridCoords = findAllGridCoords([this.coords[0] + this.velocity[0], this.coords[1] + this.velocity[1]], this.size)
@@ -161,7 +164,7 @@ export default class Player {
   }
 
   shoot (cursorX, cursorY) {
-    if (this.ammo) {
+    if (this.ammo && !this.reloading) {
       let bulletSpriteManager = new SpriteManager(this.bulletSprite)
       let offset = [
         Math.cos(this.rotation) * this.bulletStartDiff,
@@ -191,22 +194,26 @@ export default class Player {
       this.reduxDispatch(changeAmmo(this.ammo))
       this.socket.emit('newBullet', bullet.coords, bullet.id, this.rotation, bullet.velocity)
     } else if (!this.reloading) {
-      this.reloading = true
-      document.body.style.cursor = CURSOR_RELOADING[0]
-      let cursorFrame = 0
-      let interval = window.setInterval(() => {
-        if (cursorFrame === CURSOR_RELOADING.length) {
-          window.clearInterval(interval)
-          this.ammo = this.currentGun.ammo
-          this.reduxDispatch(changeAmmo(this.ammo))
-          document.body.style.cursor = CURSOR_AIMING
-          this.reloading = false
-        } else {
-          cursorFrame++
-          document.body.style.cursor = CURSOR_RELOADING[cursorFrame]
-        }
-      }, this.currentGun.reloadTime / CURSOR_RELOADING.length)
+      this.reload()
     }
+  }
+
+  reload () {
+    this.reloading = true
+    document.body.style.cursor = CURSOR_RELOADING[0]
+    let cursorFrame = 0
+    let interval = window.setInterval(() => {
+      if (cursorFrame === CURSOR_RELOADING.length) {
+        window.clearInterval(interval)
+        this.ammo = this.currentGun.ammo
+        this.reduxDispatch(changeAmmo(this.ammo))
+        document.body.style.cursor = CURSOR_AIMING
+        this.reloading = false
+      } else {
+        cursorFrame++
+        document.body.style.cursor = CURSOR_RELOADING[cursorFrame]
+      }
+    }, this.currentGun.reloadTime / CURSOR_RELOADING.length)
   }
 
   moveBullets (grid, players) {

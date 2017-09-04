@@ -4,6 +4,6 @@ export const
   rifle = {
     Bullet: BulletPlayer,
     ammo: 10,
-    speed: 30,
+    speed: 50,
     reloadTime: 2000
   }

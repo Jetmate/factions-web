@@ -11,7 +11,7 @@ import Grid from './class/Grid.js'
 import { rifle } from './guns.js'
 
 import { convertFromGrid } from './helpers.js'
-import { SCALE_FACTOR, UPDATE_WAIT, KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN, PLAYER_HEALTH } from './constants.js'
+import { SCALE_FACTOR, UPDATE_WAIT, KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN, PLAYER_HEALTH, KEY_RELOAD } from './constants.js'
 
 
 class Component extends React.Component {
@@ -175,6 +175,9 @@ function initInput (player) {
         break
       case KEY_DOWN:
         player.move('DOWN')
+        break
+      case KEY_RELOAD:
+        player.reload()
         break
     }
   })
