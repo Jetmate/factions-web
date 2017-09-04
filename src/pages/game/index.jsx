@@ -34,8 +34,8 @@ class Main extends React.Component {
     if (this.state.gameOver) {
       return (
         <Center className='element'>
-          <h3>Game Over!</h3>
-          <button onClick={this.clickHandler}>play again?</button>
+          <h2>Game Over!</h2>
+          <button className='horizontal-center' onClick={this.clickHandler}>play again?</button>
         </Center>
       )
     } else {

@@ -1,6 +1,7 @@
 import React from 'react'
 
 import style from '../stylesheet.css.js'
+import { LEADERBOARD_ROW_NUMBER } from '../constants.js'
 
 export default class Component extends React.Component {
   constructor (props) {
@@ -58,6 +59,7 @@ export default class Component extends React.Component {
     sorted.sort((a, b) => {
       return b[1] - a[1]
     })
+    sorted = sorted.slice(0, LEADERBOARD_ROW_NUMBER)
     return sorted
   }
 }
