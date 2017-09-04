@@ -72,7 +72,7 @@
 :global .vertical-center {
   display: flex;
   justify-content: center;
-
+  flex-direction: column;
 }
 
 :global .horizontal-center {

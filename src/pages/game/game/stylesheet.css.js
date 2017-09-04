@@ -13,7 +13,6 @@ export default {
   },
 
   '.gui > *': {
-    'position': 'relative',
     'margin-bottom': ELEMENT_OFFSET,
     'background-color': ELEMENT_BACKGROUND_COLOR,
     'border': `${SCALE_FACTOR}px solid ${ELEMENT_OUTLINE_COLOR}`,

@@ -1,11 +1,13 @@
 import React from 'react'
 
+import Center from '../../component/Center.jsx'
+
 class Component extends React.Component {
   render () {
     return (
-      <div>
+      <Center className='element'>
         please limit yourself to one tab
-      </div>
+      </Center>
     )
   }
 }

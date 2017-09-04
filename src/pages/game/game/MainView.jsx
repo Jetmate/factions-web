@@ -25,13 +25,6 @@ class Component extends React.Component {
     if (canvas) {
       canvas.width = window.innerWidth
       canvas.height = window.innerHeight
-      canvas.oncontextmenu = (e) => {
-        e.preventDefault()
-      }
-      window.addEventListener('resize', () => {
-        canvas.width = window.innerWidth
-        canvas.height = window.innerHeight
-      })
       let ctx = canvas.getContext('2d')
       init(ctx, this.props.socket, this.props.dispatch)
     }
@@ -42,6 +35,14 @@ export default connect()(Component)
 
 
 function init (ctx, socket, reduxDispatch) {
+  document.body.oncontextmenu = (e) => {
+    e.preventDefault()
+  }
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
+  })
+
   const spriteSheetImage = new Image()
   spriteSheetImage.src = 'media/spritesheet.png'
 
