@@ -30,22 +30,34 @@ export default class Component extends React.Component {
   }
 
   render () {
+    let sorted = this.sortState()
     return (
       <div className={this.props.className}>
-        {Object.keys(this.state).map((id) =>
+        {sorted.map(([id, kills]) =>
           (id === window.id) ? (
             <div key={id} className={"row " + style.currentPlayer}>
               <div>{id}</div>
-              <div>{this.state[id]}</div>
+              <div>{kills}</div>
             </div>
           ) : (
             <div key={id} className="row">
               <div>{id}</div>
-              <div>{this.state[id]}</div>
+              <div>{kills}</div>
             </div>
           )
         )}
       </div>
     )
+  }
+
+  sortState = () => {
+    let sorted = []
+    for (let id in this.state) {
+      sorted.push([id, this.state[id]])
+    }
+    sorted.sort((a, b) => {
+      return b[1] - a[1]
+    })
+    return sorted
   }
 }
