@@ -20,8 +20,8 @@ class Component extends GuiComponent {
   render () {
     return (
       <div style={{width: this.props.size[0], height: this.props.size[1]}} className={this.props.className}>
-        <canvas style={{position: 'absolute'}} ref={this.backgroundInit} />
-        <canvas ref={this.initCanvas}></canvas>
+        <canvas style={{position: 'absolute'}} ref={this.initCanvas}></canvas>
+        <canvas ref={this.backgroundInit} />
       </div>
     )
   }
@@ -29,16 +29,16 @@ class Component extends GuiComponent {
   backgroundInit = (canvas) => {
     canvas.width = this.props.size[0]
     canvas.height = this.props.size[1]
-    this.ctx = canvas.getContext('2d')
+    this.backgroundCtx = canvas.getContext('2d')
     this.generateBackground(JSON.parse(window.grid))
   }
 
   generateBackground = (grid) => {
-    this.ctx.fillStyle = MINIMAP_BLOCK_COLOR
+    this.backgroundCtx.fillStyle = MINIMAP_BLOCK_COLOR
     for (let x = 0; x < window.GRID_WIDTH; x++) {
       for (let y = 0; y < window.GRID_HEIGHT; y++) {
         if (grid[x][y] === 'block') {
-          this.ctx.fillRect(x * this.blockWidth, y * this.blockWidth, this.blockWidth, this.blockWidth)
+          this.backgroundCtx.fillRect(x * this.blockWidth, y * this.blockWidth, this.blockWidth, this.blockWidth)
         }
       }
     }
