@@ -86,7 +86,15 @@ export default class Grid {
     let [x, y] = coordsFunc([0, 0])
     ctx.drawImage(this.canvas, x, y)
   }
+
+  isSolid (x, y) {
+    if (this.grid[x] !== undefined && this.grid[x][y] === '') {
+      return false
+    }
+    return true
+  }
 }
+
 
 
 // function drawOutline (ctx, coordsFunc) {

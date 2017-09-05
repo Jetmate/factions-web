@@ -141,7 +141,7 @@ export default class Player {
 
     let collided = []
     for (let [x, y] of allGridCoords) {
-      if (grid.grid[x][y] === 'block') {
+      if (grid.isSolid(x, y)) {
         this.processCollision(convertFromGrid([x, y]), BLOCK_SIZE)
         collided.push(convertFromGrid([x, y]))
       }
@@ -224,7 +224,7 @@ export default class Player {
       let allGridCoords = findAllGridCoords(this.bullets[i].coords, this.bullets[i].size)
       let crashed = false
       for (let [x, y] of allGridCoords) {
-        if (grid.grid[x][y] === 'block') {
+        if (grid.isSolid(x, y)) {
           this.socket.emit('bulletCrash', this.bullets[i].id)
           crashedBullets.push(i)
           crashed = true
