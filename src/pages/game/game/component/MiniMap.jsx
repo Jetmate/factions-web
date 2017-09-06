@@ -27,10 +27,12 @@ class Component extends GuiComponent {
   }
 
   backgroundInit = (canvas) => {
-    canvas.width = this.props.size[0]
-    canvas.height = this.props.size[1]
-    this.backgroundCtx = canvas.getContext('2d')
-    this.generateBackground(JSON.parse(window.grid))
+    if (canvas) {
+      canvas.width = this.props.size[0]
+      canvas.height = this.props.size[1]
+      this.backgroundCtx = canvas.getContext('2d')
+      this.generateBackground(JSON.parse(window.grid))
+    }
   }
 
   generateBackground = (grid) => {

@@ -119,7 +119,7 @@ function initSocket (socket, player, opponents, bullets, bulletSprite, playerSpr
 
 
   socket.on('newPlayer', (id, coords) => {
-    opponents[id] = new Opponent(coords, new SpriteManager(playerSprite), PLAYER_HEALTH)
+    opponents[id] = new Opponent(coords, new SpriteManager(playerSprite), id, PLAYER_HEALTH)
 
     // console.log('NEW PLAYER:', id)
     // console.log('OPPONENTS', opponents)
@@ -131,7 +131,7 @@ function initSocket (socket, player, opponents, bullets, bulletSprite, playerSpr
 
   socket.on('player', (id, coords, health) => {
     if (!(id in opponents)) {
-      opponents[id] = new Opponent(coords, new SpriteManager(playerSprite), health)
+      opponents[id] = new Opponent(coords, new SpriteManager(playerSprite), id, health)
     }
 
     // console.log('RECEIVED PLAYER:', id)

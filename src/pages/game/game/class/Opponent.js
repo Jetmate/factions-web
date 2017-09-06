@@ -1,18 +1,25 @@
-import { HEALTH_BAR2_OFFSET, HEALTH_BAR2_SIZE, PLAYER_HEALTH } from '../constants.js'
+import { SCALE_FACTOR, OPPONENT_HEALTH_BAR_OFFSET, OPPONENT_TEXT_OFFSET, OPPONENT_HEALTH_BAR_SIZE, PLAYER_HEALTH, OPPONENT_BACKGROUND_SIZE, OPPONENT_BACKGROUND_OFFSET, FONT } from '../constants.js'
 import HealthBar from './gui/HealthBarMoving.js'
 import Thing from './Thing.js'
+import Background from './gui/Background.js'
 import { findCenter } from '../helpers.js'
 
 export default class Opponent extends Thing {
-  constructor (coords, spriteManager, health) {
+  constructor (coords, spriteManager, id, health) {
     super(coords, spriteManager)
 
     this.health = health
     this.initialHealth = PLAYER_HEALTH
-    this.healthBar = new HealthBar(HEALTH_BAR2_SIZE, 0)
+    this.healthBar = new HealthBar(OPPONENT_HEALTH_BAR_SIZE, 0)
     this.healthBar.changeHealth(this.health / this.initialHealth)
+    this.background = new Background(OPPONENT_BACKGROUND_SIZE)
+    let ctx = this.background.ctx
+    ctx.font = FONT
+    ctx.fillStyle= 'black'
+    ctx.fillText(id, findCenter(OPPONENT_BACKGROUND_SIZE, [ctx.measureText(id).width, 0])[0] + SCALE_FACTOR, OPPONENT_TEXT_OFFSET)
 
-    this.xOffset = findCenter(this.size, this.healthBar.size)[0]
+    this.backgroundXOffset = findCenter(this.size, OPPONENT_BACKGROUND_SIZE)[0]
+    this.healthBarXOffset = findCenter(this.size, OPPONENT_HEALTH_BAR_SIZE)[0] + SCALE_FACTOR
   }
 
   processChange (changeType, value) {
@@ -39,6 +46,8 @@ export default class Opponent extends Thing {
   draw (ctx, coordsFunc) {
     let [x, y] = coordsFunc(this.coords)
     ctx.drawImage(this.spriteManager.currentSprite(), x, y)
-    this.healthBar.draw(ctx, [x + this.xOffset, y + HEALTH_BAR2_OFFSET])
+    ctx.drawImage(this.background.sprite, x + this.backgroundXOffset, y + OPPONENT_BACKGROUND_OFFSET)
+    // console.log(y + OPPONENT_HEALTH_BAR_OFFSET, OPPONENT_HEALTH_BAR_OFFSET)
+    this.healthBar.draw(ctx, [x + this.healthBarXOffset, y + OPPONENT_HEALTH_BAR_OFFSET])
   }
 }
