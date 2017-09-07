@@ -3,8 +3,9 @@ function randRange (upper) {
 }
 
 class Grid {
-  constructor (width, height, fillPercent, smoothRate, smoothCount) {
+  constructor (width, height, fillPercent, smoothRate, smoothCount, treePercent) {
     this.FILL_PERCENT = fillPercent
+    this.TREE_PERCENT = treePercent
     this.SMOOTH_RATE = smoothRate
     this.SMOOTH_COUNT = smoothCount
     this.width = width
@@ -38,9 +39,17 @@ class Grid {
     this.ctx.stroke()
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
-        if (this.grid[x][y] === 'block') {
-          this.ctx.fillRect(x * BLOCK_WIDTH, y * BLOCK_WIDTH, BLOCK_WIDTH, BLOCK_WIDTH)
+        switch (this.grid[x][y]) {
+          case 'block':
+            this.ctx.fillStyle = 'black'
+            break
+          case 'tree':
+            this.ctx.fillStyle = 'green'
+            break
+          default:
+            continue
         }
+        this.ctx.fillRect(x * BLOCK_WIDTH, y * BLOCK_WIDTH, BLOCK_WIDTH, BLOCK_WIDTH)
       }
     }
   }
@@ -51,11 +60,12 @@ class Grid {
 
   generateGrid () {
     let grid = this.createGrid()
-    this.populateGrid(grid)
+    this.populateGrid(grid, this.FILL_PERCENT, 'block')
     for (let i = 0; i < this.SMOOTH_COUNT; i++) {
       grid = this.smoothGrid(grid)
     }
     this.outlineGrid(grid)
+    this.growTrees(grid)
     return grid
   }
 
@@ -72,13 +82,22 @@ class Grid {
     return grid
   }
 
-  populateGrid (grid) {
+  populateGrid (grid, chance, type) {
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
-        if (randRange(100) < this.FILL_PERCENT) {
-          grid[x][y] = 'block'
-        } else {
-          grid[x][y] = ''
+        if (Math.random() < chance) {
+          grid[x][y] = type
+        }
+      }
+    }
+  }
+
+
+  growTrees (grid) {
+    for (let x = 0; x < this.width; x++) {
+      for (let y = 0; y < this.height; y++) {
+        if (!grid[x][y] && Math.random() < this.TREE_PERCENT) {
+          grid[x][y] = 'tree'
         }
       }
     }
@@ -244,14 +263,16 @@ let grids = []
 // }
 
 
-const GRID_WIDTH = 160
+const GRID_WIDTH = 50
 for (let [fillPercent, smoothRate, smoothCount] of [
-  [24, 4, 3],
-  [49, 5, 4],
-  [15, 3, 5],
-  [20, 3, 4]
+  [.24, 4, 3],
+  [.49, 5, 4],
+  [.15, 3, 5],
+  [.20, 3, 4]
 ]) {
-  grids.push(new Grid(GRID_WIDTH, GRID_WIDTH, fillPercent, smoothRate, smoothCount))
+  for (let i1 = .0001; i1 <= .01; i1 += .0002) {
+    grids.push(new Grid(GRID_WIDTH, GRID_WIDTH, fillPercent, smoothRate, smoothCount, i1))
+  }
 }
 
 
@@ -267,7 +288,7 @@ canvas.height = grids.length / ROW_COUNT * TOTAL_WIDTH
 const ctx = canvas.getContext('2d')
 // ctx.scale(10, 10)
 ctx.imageSmoothingEnabled = false
-ctx.font = '50px sans-serif'
+ctx.font = '10px sans-serif'
 
 let currentIndex = 0
 let y = 0
@@ -275,13 +296,13 @@ let end = false
 while (true) {
   for (let x = 0; x < ROW_COUNT; x++) {
     ctx.fillText(
-      `${grids[currentIndex].FILL_PERCENT} ${grids[currentIndex].SMOOTH_RATE} ${grids[currentIndex].SMOOTH_COUNT}`,
+      `${grids[currentIndex].FILL_PERCENT} ${grids[currentIndex].SMOOTH_RATE} ${grids[currentIndex].SMOOTH_COUNT} ${grids[currentIndex].TREE_PERCENT}`,
       x * TOTAL_WIDTH,
       y * TOTAL_WIDTH + GRID_GAP * 2
     )
     grids[currentIndex].draw(ctx, x * TOTAL_WIDTH, y * TOTAL_WIDTH + GRID_GAP * 2)
     currentIndex++
-    console.log(currentIndex, grids.length)
+    // console.log(currentIndex, grids.length)
     if (currentIndex === grids.length) {
       end = true
       break

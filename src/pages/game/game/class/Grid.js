@@ -1,4 +1,4 @@
-import { BLOCK_WIDTH, REAL_BLOCK_WIDTH, SCALE_FACTOR, BLOCK_OUTLINE_COLOR, BLOCK_COLOR, BLOCK_OUTLINE_WIDTH, FLOOR_COLOR } from '../constants.js'
+import { BLOCK_WIDTH, REAL_BLOCK_WIDTH, SCALE_FACTOR, BLOCK_OUTLINE_COLOR, BLOCK_COLOR, BLOCK_OUTLINE_WIDTH, FLOOR_COLOR, TREE_COLOR, TREE_OUTLINE, WIDTH, HEIGHT } from '../constants.js'
 
 export default class Grid {
   constructor (grid, blockSprite) {
@@ -36,6 +36,8 @@ export default class Grid {
     // }
     // this.ctx.stroke()
 
+    this.ctx.fillStyle = FLOOR_COLOR
+    this.ctx.fillRect(0, 0, WIDTH, HEIGHT)
 
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
@@ -74,9 +76,11 @@ export default class Grid {
               this.ctx.fillRect(x * REAL_BLOCK_WIDTH + (REAL_BLOCK_WIDTH - BLOCK_OUTLINE_WIDTH), y * REAL_BLOCK_WIDTH + (REAL_BLOCK_WIDTH - BLOCK_OUTLINE_WIDTH), BLOCK_OUTLINE_WIDTH, BLOCK_OUTLINE_WIDTH)
             }
           }
-        } else {
-          this.ctx.fillStyle = FLOOR_COLOR
+        } else if (this.grid[x][y] === 'tree') {
+          this.ctx.fillStyle = TREE_OUTLINE
           this.ctx.fillRect(x * REAL_BLOCK_WIDTH, y * REAL_BLOCK_WIDTH, REAL_BLOCK_WIDTH, REAL_BLOCK_WIDTH)
+          this.ctx.fillStyle = TREE_COLOR
+          this.ctx.fillRect(x * REAL_BLOCK_WIDTH + 1, y * REAL_BLOCK_WIDTH + 1, REAL_BLOCK_WIDTH - 2, REAL_BLOCK_WIDTH - 2)
         }
       }
     }
