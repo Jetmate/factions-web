@@ -14,7 +14,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.css(\.js)?$/,
+        test: /\.css$/,
         use: [
           {
             loader: 'style-loader'
@@ -32,14 +32,6 @@ module.exports = {
                 return [autoprefixer]
               }
             }
-          }
-        ]
-      },
-      {
-        test: /\.css\.js$/,
-        use: [
-          {
-            loader: 'css-in-js-loader'
           }
         ]
       },

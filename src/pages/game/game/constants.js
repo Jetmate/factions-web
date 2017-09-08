@@ -1,11 +1,30 @@
+// let gridWidth = (typeof window !== 'undefined') ? window.GRID_WIDTH : 0
+// let gridHeight = (typeof window !== 'undefined') ? window.GRID_HEIGHT : 0
+
+let gridWidth = 0
+let gridHeight = 0
+let width = 0
+let height = 0
+let elementWidth = 0
+
+if (typeof window !== 'undefined') {
+  gridWidth = window.GRID_WIDTH
+  gridHeight = window.GRID_HEIGHT
+  width = window.innerWidth
+  height = window.innerHeight
+  elementWidth = width / 16 >> 0
+}
+
 export const
   SCALE_FACTOR = 3,
   REAL_BLOCK_WIDTH = 16,
   BLOCK_WIDTH = REAL_BLOCK_WIDTH * SCALE_FACTOR,
   BLOCK_SIZE = [BLOCK_WIDTH, BLOCK_WIDTH],
 
-  WIDTH = (typeof window !== 'undefined') ? window.GRID_HEIGHT * BLOCK_WIDTH : null,
-  HEIGHT = (typeof window !== 'undefined') ? window.GRID_WIDTH * BLOCK_WIDTH : null,
+  // WIDTH = (typeof window !== 'undefined') ? window.GRID_HEIGHT * BLOCK_WIDTH : null,
+  // HEIGHT = (typeof window !== 'undefined') ? window.GRID_WIDTH * BLOCK_WIDTH : null,
+  WIDTH = gridWidth * BLOCK_WIDTH,
+  HEIGHT = gridHeight * BLOCK_WIDTH,
 
   UPDATE_WAIT = 33,
 
@@ -28,14 +47,14 @@ export const
   ELEMENT_OFFSET = 25,
   GUI_MARGIN = 50,
 
-  HEALTH_BAR_SIZE = [100, 300],
+  HEALTH_BAR_SIZE = [elementWidth, 300],
   HEALTH_BAR_COLOR = '#966f6f',
 
   PLAYER_SPEED = 10,
   DIAGONAL_PLAYER_SPEED = PLAYER_SPEED / Math.sqrt(2),
   PLAYER_HEALTH = 10,
 
-  MINIMAP_SIZE = [100, 100],
+  MINIMAP_SIZE = [elementWidth, elementWidth],
   MINIMAP_PLAYER_COLOR = '#4a6782',
   MINIMAP_MARKER_WIDTH = 10,
   MINIMAP_BLOCK_COLOR = '#bababa',
@@ -56,7 +75,7 @@ export const
   BULLET_BAR_GAP = SCALE_FACTOR,
   BULLET_BAR_BULLET_OUTLINE = '#C0B283',
   BULLET_BAR_BULLET_COLOR = '#DCD0C0',
-  BULLET_BAR_SIZE = [100, 300],
+  BULLET_BAR_SIZE = [elementWidth, 300],
 
   CURSOR_AIMING = 'url(media/aiming.gif), auto',
   CURSOR_RELOADING = ['url(media/reloading1.gif), auto', 'url(media/reloading2.gif), auto', 'url(media/reloading3.gif), auto', 'url(media/reloading4.gif), auto'],
@@ -66,7 +85,7 @@ export const
   LEADERBOARD_ROW_NUMBER = 10,
   LEADERBOARD_ROW_PADDING = 10,
   LEADERBOARD_PADDING = 10,
-  LEADERBOARD_SIZE = [100, (LEADERBOARD_ROW_HEIGHT + LEADERBOARD_ROW_PADDING) * LEADERBOARD_ROW_NUMBER - LEADERBOARD_ROW_PADDING + LEADERBOARD_PADDING],
+  LEADERBOARD_SIZE = [elementWidth, (LEADERBOARD_ROW_HEIGHT + LEADERBOARD_ROW_PADDING) * LEADERBOARD_ROW_NUMBER - LEADERBOARD_ROW_PADDING + LEADERBOARD_PADDING],
 
   FONT_SIZE = 15,
   FONT = `${FONT_SIZE}px Montserrat`,

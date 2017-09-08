@@ -1,0 +1,33 @@
+.gane {
+    position: absolute;
+    top: 0;
+    z-index: -1;
+    background-color: #6d7993
+}
+.gui {
+    margin: 50px
+}
+.gui > * {
+    margin-bottom: 25px;
+    background-color: #e0e0e0;
+    border: 3px solid #bababa;
+    display: block
+}
+.right {
+    float: right;
+    clear: both
+}
+.leaderboard {
+    margin: 0;
+    margin-bottom: 25px;
+    list-style: none;
+    padding: 10px
+}
+.leaderboard :global .row {
+    margin-bottom: 10px;
+    height: 15px
+}
+.currentPlayer {
+    background-color: #bababa;
+    padding: 3px 0
+}

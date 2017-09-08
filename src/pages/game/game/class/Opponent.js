@@ -17,7 +17,7 @@ export default class Opponent extends Thing {
     ctx.font = FONT
     ctx.fillStyle= 'black'
     ctx.fillText(id, findCenter(OPPONENT_BACKGROUND_SIZE, [ctx.measureText(id).width, 0])[0] + SCALE_FACTOR, OPPONENT_TEXT_OFFSET)
-    ctx.drawImage((new Background(OPPONENT_HEALTH_BAR_SIZE)).sprite, 0, OPPONENT_BACKGROUND_SIZE[1] -OPPONENT_HEALTH_BAR_SIZE[1])
+    ctx.drawImage((new Background(OPPONENT_HEALTH_BAR_SIZE)).sprite, 0, OPPONENT_BACKGROUND_SIZE[1] - OPPONENT_HEALTH_BAR_SIZE[1])
 
     this.backgroundXOffset = findCenter(this.size, OPPONENT_BACKGROUND_SIZE)[0]
     this.healthBarXOffset = findCenter(this.size, OPPONENT_HEALTH_BAR_SIZE)[0] + SCALE_FACTOR

@@ -1,7 +1,7 @@
 import React from 'react'
 
-import style from '../stylesheet.css.js'
-import { LEADERBOARD_ROW_NUMBER } from '../constants.js'
+import style from '../stylesheet.css'
+import { LEADERBOARD_ROW_NUMBER, LEADERBOARD_SIZE } from '../constants.js'
 
 export default class Component extends React.Component {
   constructor (props) {
@@ -33,7 +33,7 @@ export default class Component extends React.Component {
   render () {
     let sorted = this.sortState()
     return (
-      <div className={this.props.className}>
+      <div style={{width: LEADERBOARD_SIZE[0], height: LEADERBOARD_SIZE[1]}} className={this.props.className}>
         {sorted.map(([id, kills]) =>
           (id === window.id) ? (
             <div key={id} className={"row " + style.currentPlayer}>
