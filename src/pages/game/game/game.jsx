@@ -10,7 +10,7 @@ import MainView from './MainView.jsx'
 
 class Component extends React.Component {
   render () {
-    const elementStyle = {'margin-bottom': ELEMENT_OFFSET}
+    const elementStyle = {marginBottom: ELEMENT_OFFSET}
     return (
       <div>
         <div style={{margin: GUI_MARGIN + 'px'}} className={style.gui}>
