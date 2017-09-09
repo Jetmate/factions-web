@@ -1,7 +1,7 @@
 import React from 'react'
 import style from './stylesheet.css'
 
-import { HEALTH_BAR_SIZE, BULLET_BAR_SIZE, MINIMAP_SIZE, LEADERBOARD_SIZE } from './constants.js'
+import { HEALTH_BAR_SIZE, BULLET_BAR_SIZE, MINIMAP_SIZE, LEADERBOARD_SIZE, GUI_MARGIN, ELEMENT_OFFSET } from './constants.js'
 import HealthBar from './component/HealthBar.jsx'
 import BulletBar from './component/BulletBar.jsx'
 import MiniMap from './component/MiniMap.jsx'
@@ -10,14 +10,15 @@ import MainView from './MainView.jsx'
 
 class Component extends React.Component {
   render () {
+    const elementStyle = {'margin-bottom': ELEMENT_OFFSET}
     return (
       <div>
-        <div className={style.gui}>
-          <Leaderboard className={style.right + ' ' + style.leaderboard} socket={this.props.socket} />
+        <div style={{margin: GUI_MARGIN + 'px'}} className={style.gui}>
+          <Leaderboard className={style.right + ' ' + style.leaderboard} socket={this.props.socket} style={elementStyle} />
 
-          <HealthBar size={HEALTH_BAR_SIZE} />
-          <BulletBar size={BULLET_BAR_SIZE} />
-          <MiniMap size={MINIMAP_SIZE} />
+          <HealthBar style={elementStyle} size={HEALTH_BAR_SIZE} />
+          <BulletBar style={elementStyle} size={BULLET_BAR_SIZE} />
+          <MiniMap style={elementStyle} size={MINIMAP_SIZE} />
         </div>
         <MainView className={style.game} socket={this.props.socket} />
       </div>

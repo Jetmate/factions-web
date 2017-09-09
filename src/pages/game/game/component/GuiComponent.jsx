@@ -7,7 +7,7 @@ export default class GuiComponent extends React.Component {
 
   render () {
     return (
-      <canvas className={this.props.className} ref={this.initCanvas}></canvas>
+      <canvas className={this.props.className} ref={this.initCanvas} style={this.props.style}></canvas>
     )
   }
 

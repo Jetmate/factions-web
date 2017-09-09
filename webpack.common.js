@@ -15,6 +15,7 @@ module.exports = {
     rules: [
       {
         test: /\.css$/,
+        include: APP_DIR,
         use: [
           {
             loader: 'style-loader'
@@ -36,9 +37,8 @@ module.exports = {
         ]
       },
       {
-        test: /\.(js|jsx)$/,
+        test: /\.jsx?$/,
         include: APP_DIR,
-        enforce: 'pre',
         loader: 'babel-loader',
         options: {
           'presets': ['env', 'stage-0', 'react']
@@ -46,6 +46,7 @@ module.exports = {
       },
       {
         test: /\.(png|woff|woff2|eot|ttf|otf|svg)$/,
+        include: APP_DIR,
         loader: 'url-loader',
         options: {
           limit: 100000

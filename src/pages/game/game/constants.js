@@ -1,10 +1,10 @@
-const GUI_MARGIN = 50
-const ELEMENT_PADDING = 25
+export const GUI_MARGIN = window.innerWidth / 40 >> 0
+export const ELEMENT_OFFSET = window.innerHeight / 40 >> 0
+export const SCALE_FACTOR = 3
 const ELEMENT_WIDTH = window.innerWidth / 16 >> 0
-const ELEMENTS_HEIGHT = (window.innerHeight - GUI_MARGIN * 2 - ELEMENT_WIDTH) / 2 - ELEMENT_PADDING
+const ELEMENTS_HEIGHT = (window.innerHeight - GUI_MARGIN * 2 - ELEMENT_WIDTH - SCALE_FACTOR * 2) / 2 - ELEMENT_OFFSET - SCALE_FACTOR * 2
 
 export const
-  SCALE_FACTOR = 3,
   REAL_BLOCK_WIDTH = 16,
   BLOCK_WIDTH = REAL_BLOCK_WIDTH * SCALE_FACTOR,
   BLOCK_SIZE = [BLOCK_WIDTH, BLOCK_WIDTH],

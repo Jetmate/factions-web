@@ -19,7 +19,7 @@ class Component extends GuiComponent {
 
   render () {
     return (
-      <div style={{width: this.props.size[0], height: this.props.size[1]}} className={this.props.className}>
+      <div style={{...{width: this.props.size[0], height: this.props.size[1]}, ...this.props.style}} className={this.props.className}>
         <canvas style={{position: 'absolute'}} ref={this.initCanvas}></canvas>
         <canvas ref={this.backgroundInit} />
       </div>

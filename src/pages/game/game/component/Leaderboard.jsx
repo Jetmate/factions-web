@@ -33,7 +33,7 @@ export default class Component extends React.Component {
   render () {
     let sorted = this.sortState()
     return (
-      <div style={{width: LEADERBOARD_SIZE[0], height: LEADERBOARD_SIZE[1]}} className={this.props.className}>
+      <div style={{...{width: LEADERBOARD_SIZE[0], height: LEADERBOARD_SIZE[1]}, ...this.props.style}} className={this.props.className}>
         {sorted.map(([id, kills]) =>
           (id === window.id) ? (
             <div key={id} className={"row " + style.currentPlayer}>
