@@ -228,6 +228,7 @@ export default class Player {
           this.socket.emit('bulletCrash', this.bullets[i].id)
           crashedBullets.push(i)
           crashed = true
+          grid.takeDamage(x, y)
           break
         }
       }

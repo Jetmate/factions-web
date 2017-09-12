@@ -1,11 +1,12 @@
-import { BLOCK_WIDTH, REAL_BLOCK_WIDTH, SCALE_FACTOR, BLOCK_OUTLINE_COLOR, BLOCK_COLOR, BLOCK_OUTLINE_WIDTH, FLOOR_COLOR, TREE_COLOR, TREE_OUTLINE, WIDTH, HEIGHT } from '../constants.js'
+import { BLOCK_WIDTH, REAL_BLOCK_WIDTH, SCALE_FACTOR, BLOCK_OUTLINE_COLOR, BLOCK_COLOR, BLOCK_OUTLINE_WIDTH, FLOOR_COLOR, TREE_COLOR, TREE_OUTLINE, WIDTH, HEIGHT, DESTRUCTIBLE_BLOCKS, BLOCK_HEALTHS } from '../constants.js'
 
 export default class Grid {
-  constructor (grid, blockSprite) {
+  constructor (grid, blockSprite, socket) {
     this.grid = grid
-    this.canvas = document.createElement('canvas')
     this.width = grid.length
     this.height = grid[0].length
+    this.health = this.generateHealth(grid)
+    this.canvas = document.createElement('canvas')
     this.canvas.width = this.width * BLOCK_WIDTH
     this.canvas.height = this.height * BLOCK_WIDTH
     this.ctx = this.canvas.getContext('2d')
@@ -14,7 +15,21 @@ export default class Grid {
     this.ctx.mozImageSmoothingEnabled = false
     this.ctx.scale(SCALE_FACTOR, SCALE_FACTOR)
     this.blockSprite = blockSprite
+    this.socket = socket
     this.generateSprite()
+  }
+
+  generateHealth (grid) {
+    let health = []
+    for (let x = 0; x < this.width; x++) {
+      health.push([])
+      for (let y = 0; y < this.height; y++) {
+        if (DESTRUCTIBLE_BLOCKS.includes(grid[x][y])) {
+          health[x][y] = BLOCK_HEALTHS[grid[x][y]]
+        }
+      }
+    }
+    return health
   }
 
   generateSprite () {
@@ -41,48 +56,56 @@ export default class Grid {
 
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
-        if (this.grid[x][y] === 'block') {
-          this.ctx.fillStyle = BLOCK_COLOR
-          this.ctx.fillRect(x * REAL_BLOCK_WIDTH, y * REAL_BLOCK_WIDTH, REAL_BLOCK_WIDTH, REAL_BLOCK_WIDTH)
+        this.drawBlock(x, y, false)
+      }
+    }
+  }
 
-          this.ctx.fillStyle = BLOCK_OUTLINE_COLOR
-          if (this.grid[x - 1] && this.grid[x - 1][y] === '') {
-            this.ctx.fillRect(x * REAL_BLOCK_WIDTH, y * REAL_BLOCK_WIDTH, BLOCK_OUTLINE_WIDTH, REAL_BLOCK_WIDTH)
-          }
-          if (this.grid[x + 1] && this.grid[x + 1][y] === '') {
-            this.ctx.fillRect(x * REAL_BLOCK_WIDTH + (REAL_BLOCK_WIDTH - BLOCK_OUTLINE_WIDTH), y * REAL_BLOCK_WIDTH, BLOCK_OUTLINE_WIDTH, REAL_BLOCK_WIDTH)
-          }
-          if (this.grid[x][y - 1] === '') {
-            this.ctx.fillRect(x * REAL_BLOCK_WIDTH, y * REAL_BLOCK_WIDTH, REAL_BLOCK_WIDTH, BLOCK_OUTLINE_WIDTH)
-          }
-          if (this.grid[x][y + 1] === '') {
-            this.ctx.fillRect(x * REAL_BLOCK_WIDTH, y * REAL_BLOCK_WIDTH + (REAL_BLOCK_WIDTH - BLOCK_OUTLINE_WIDTH), REAL_BLOCK_WIDTH, BLOCK_OUTLINE_WIDTH)
-          }
+  drawBlock (x, y, includeFloor = true) {
+    let blockType = this.findType(x, y)
+    if (blockType === 'block') {
+      this.ctx.fillStyle = BLOCK_COLOR
+      this.ctx.fillRect(x * REAL_BLOCK_WIDTH, y * REAL_BLOCK_WIDTH, REAL_BLOCK_WIDTH, REAL_BLOCK_WIDTH)
 
-          this.ctx.fillStyle = FLOOR_COLOR
-          if (this.grid[x - 1] && this.grid[x - 1][y] === '') {
-            if (this.grid[x][y - 1] === '') {
-              this.ctx.fillRect(x * REAL_BLOCK_WIDTH, y * REAL_BLOCK_WIDTH, BLOCK_OUTLINE_WIDTH, BLOCK_OUTLINE_WIDTH)
-            }
-            if (this.grid[x][y + 1] === '') {
-              this.ctx.fillRect(x * REAL_BLOCK_WIDTH, y * REAL_BLOCK_WIDTH + (REAL_BLOCK_WIDTH - BLOCK_OUTLINE_WIDTH), BLOCK_OUTLINE_WIDTH, BLOCK_OUTLINE_WIDTH)
-            }
-          }
-          if (this.grid[x + 1] && this.grid[x + 1][y] === '') {
-            if (this.grid[x][y - 1] === '') {
-              this.ctx.fillRect(x * REAL_BLOCK_WIDTH + (REAL_BLOCK_WIDTH - BLOCK_OUTLINE_WIDTH), y * REAL_BLOCK_WIDTH, BLOCK_OUTLINE_WIDTH, BLOCK_OUTLINE_WIDTH)
-            }
-            if (this.grid[x][y + 1] === '') {
-              this.ctx.fillRect(x * REAL_BLOCK_WIDTH + (REAL_BLOCK_WIDTH - BLOCK_OUTLINE_WIDTH), y * REAL_BLOCK_WIDTH + (REAL_BLOCK_WIDTH - BLOCK_OUTLINE_WIDTH), BLOCK_OUTLINE_WIDTH, BLOCK_OUTLINE_WIDTH)
-            }
-          }
-        } else if (this.grid[x][y] === 'tree') {
-          this.ctx.fillStyle = TREE_OUTLINE
-          this.ctx.fillRect(x * REAL_BLOCK_WIDTH, y * REAL_BLOCK_WIDTH, REAL_BLOCK_WIDTH, REAL_BLOCK_WIDTH)
-          this.ctx.fillStyle = TREE_COLOR
-          this.ctx.fillRect(x * REAL_BLOCK_WIDTH + 1, y * REAL_BLOCK_WIDTH + 1, REAL_BLOCK_WIDTH - 2, REAL_BLOCK_WIDTH - 2)
+      this.ctx.fillStyle = BLOCK_OUTLINE_COLOR
+      if (this.findType(x - 1, y) === '') {
+        this.ctx.fillRect(x * REAL_BLOCK_WIDTH, y * REAL_BLOCK_WIDTH, BLOCK_OUTLINE_WIDTH, REAL_BLOCK_WIDTH)
+      }
+      if (this.findType(x + 1, y) === '') {
+        this.ctx.fillRect(x * REAL_BLOCK_WIDTH + (REAL_BLOCK_WIDTH - BLOCK_OUTLINE_WIDTH), y * REAL_BLOCK_WIDTH, BLOCK_OUTLINE_WIDTH, REAL_BLOCK_WIDTH)
+      }
+      if (this.grid[x][y - 1] === '') {
+        this.ctx.fillRect(x * REAL_BLOCK_WIDTH, y * REAL_BLOCK_WIDTH, REAL_BLOCK_WIDTH, BLOCK_OUTLINE_WIDTH)
+      }
+      if (this.grid[x][y + 1] === '') {
+        this.ctx.fillRect(x * REAL_BLOCK_WIDTH, y * REAL_BLOCK_WIDTH + (REAL_BLOCK_WIDTH - BLOCK_OUTLINE_WIDTH), REAL_BLOCK_WIDTH, BLOCK_OUTLINE_WIDTH)
+      }
+
+      this.ctx.fillStyle = FLOOR_COLOR
+      if (this.findType(x - 1, y) === '') {
+        if (this.grid[x][y - 1] === '') {
+          this.ctx.fillRect(x * REAL_BLOCK_WIDTH, y * REAL_BLOCK_WIDTH, BLOCK_OUTLINE_WIDTH, BLOCK_OUTLINE_WIDTH)
+        }
+        if (this.grid[x][y + 1] === '') {
+          this.ctx.fillRect(x * REAL_BLOCK_WIDTH, y * REAL_BLOCK_WIDTH + (REAL_BLOCK_WIDTH - BLOCK_OUTLINE_WIDTH), BLOCK_OUTLINE_WIDTH, BLOCK_OUTLINE_WIDTH)
         }
       }
+      if (this.findType(x + 1, y) === '') {
+        if (this.grid[x][y - 1] === '') {
+          this.ctx.fillRect(x * REAL_BLOCK_WIDTH + (REAL_BLOCK_WIDTH - BLOCK_OUTLINE_WIDTH), y * REAL_BLOCK_WIDTH, BLOCK_OUTLINE_WIDTH, BLOCK_OUTLINE_WIDTH)
+        }
+        if (this.grid[x][y + 1] === '') {
+          this.ctx.fillRect(x * REAL_BLOCK_WIDTH + (REAL_BLOCK_WIDTH - BLOCK_OUTLINE_WIDTH), y * REAL_BLOCK_WIDTH + (REAL_BLOCK_WIDTH - BLOCK_OUTLINE_WIDTH), BLOCK_OUTLINE_WIDTH, BLOCK_OUTLINE_WIDTH)
+        }
+      }
+    } else if (blockType === 'tree') {
+      this.ctx.fillStyle = TREE_OUTLINE
+      this.ctx.fillRect(x * REAL_BLOCK_WIDTH, y * REAL_BLOCK_WIDTH, REAL_BLOCK_WIDTH, REAL_BLOCK_WIDTH)
+      this.ctx.fillStyle = TREE_COLOR
+      this.ctx.fillRect(x * REAL_BLOCK_WIDTH + 1, y * REAL_BLOCK_WIDTH + 1, REAL_BLOCK_WIDTH - 2, REAL_BLOCK_WIDTH - 2)
+    } else if (includeFloor) {
+      this.ctx.fillStyle = FLOOR_COLOR
+      this.ctx.fillRect(x * REAL_BLOCK_WIDTH, y * REAL_BLOCK_WIDTH, REAL_BLOCK_WIDTH, REAL_BLOCK_WIDTH)
     }
   }
 
@@ -91,11 +114,37 @@ export default class Grid {
     ctx.drawImage(this.canvas, x, y)
   }
 
+  findType (x, y) {
+    if (this.grid[x] !== undefined) {
+      return this.grid[x][y]
+    }
+    return undefined
+  }
+
   isSolid (x, y) {
-    if (this.grid[x] !== undefined && this.grid[x][y] === '') {
+    if (this.findType(x, y) === '') {
       return false
     }
     return true
+  }
+
+  takeDamage (x, y) {
+    if (DESTRUCTIBLE_BLOCKS.includes(this.grid[x][y])) {
+      this.health[x][y]--
+      if (!this.health[x][y]) {
+        this.socket.emit('gridChange', x, y, '')
+        this.changeBlock(x, y, '')
+      }
+    }
+  }
+
+  changeBlock (x, y, newType) {
+    this.grid[x][y] = newType
+    this.drawBlock(x, y)
+    this.drawBlock(x - 1, y)
+    this.drawBlock(x + 1, y)
+    this.drawBlock(x, y - 1)
+    this.drawBlock(x, y + 1)
   }
 }
 

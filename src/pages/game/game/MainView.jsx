@@ -70,11 +70,11 @@ function init (ctx, socket, reduxDispatch) {
 
     socket.emit('newPlayer', window.id, player.coords)
 
-    let grid = new Grid(JSON.parse(window.grid), blockSprite)
+    let grid = new Grid(JSON.parse(window.grid), blockSprite, socket)
     let opponents = {}
     let bullets = {}
 
-    initSocket(socket, player, opponents, bullets, bulletSprite, playerSprite)
+    initSocket(socket, player, opponents, bullets, bulletSprite, playerSprite, grid)
     initInput(player)
 
 
@@ -99,7 +99,7 @@ function init (ctx, socket, reduxDispatch) {
   }
 }
 
-function initSocket (socket, player, opponents, bullets, bulletSprite, playerSprite) {
+function initSocket (socket, player, opponents, bullets, bulletSprite, playerSprite, grid) {
   socket.on('newBullet', (coords, id, rotation, velocity) => {
     bullets[id] = new BulletOpponent(coords, new SpriteManager(bulletSprite), id, rotation, velocity)
   })
@@ -158,6 +158,11 @@ function initSocket (socket, player, opponents, bullets, bulletSprite, playerSpr
 
   socket.on('reload', (id) => {
     delete opponents[id]
+  })
+
+
+  socket.on('gridChange', (x, y, newType) => {
+    grid.changeBlock(x, y, newType)
   })
 }
 

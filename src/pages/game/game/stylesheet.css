@@ -5,6 +5,10 @@
   background-color: #6d7993;
 }
 
+.gui {
+  user-select: none;
+}
+
 .gui > * {
   background-color: #e0e0e0;
   border: 3px solid #bababa;
