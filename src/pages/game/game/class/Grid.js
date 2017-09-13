@@ -1,4 +1,5 @@
-import { BLOCK_WIDTH, REAL_BLOCK_WIDTH, SCALE_FACTOR, BLOCK_OUTLINE_COLOR, BLOCK_COLOR, BLOCK_OUTLINE_WIDTH, FLOOR_COLOR, TREE_COLOR, TREE_OUTLINE, WIDTH, HEIGHT, DESTRUCTIBLE_BLOCKS, BLOCK_HEALTHS } from '../constants.js'
+import { BLOCK_WIDTH, REAL_BLOCK_WIDTH, SCALE_FACTOR, BLOCK_OUTLINE_COLOR, BLOCK_COLOR, BLOCK_OUTLINE_WIDTH, FLOOR_COLOR, TREE_COLOR, TREE_OUTLINE, WIDTH, HEIGHT, DESTRUCTIBLE_BLOCKS, BLOCK_HEALTHS, BLOCK_DAMAGE_COLOR } from '../constants.js'
+import { convertFromGrid } from '../helpers.js'
 
 export default class Grid {
   constructor (grid, blockSprite, socket) {
@@ -20,12 +21,11 @@ export default class Grid {
   }
 
   generateHealth (grid) {
-    let health = []
+    let health = {}
     for (let x = 0; x < this.width; x++) {
-      health.push([])
       for (let y = 0; y < this.height; y++) {
         if (DESTRUCTIBLE_BLOCKS.includes(grid[x][y])) {
-          health[x][y] = BLOCK_HEALTHS[grid[x][y]]
+          health[[x, y]] = BLOCK_HEALTHS[grid[x][y]]
         }
       }
     }
@@ -130,10 +130,25 @@ export default class Grid {
 
   takeDamage (x, y) {
     if (DESTRUCTIBLE_BLOCKS.includes(this.grid[x][y])) {
-      this.health[x][y]--
-      if (!this.health[x][y]) {
+      this.health[[x, y]]--
+      if (!this.health[[x, y]]) {
         this.socket.emit('gridChange', x, y, '')
         this.changeBlock(x, y, '')
+        delete this.health[[x, y]]
+      }
+    }
+  }
+
+  drawDamage (ctx, coordsFunc) {
+    ctx.fillStyle = BLOCK_DAMAGE_COLOR
+    for (let coords in this.health) {
+      let newCoords = coords.split(',')
+      newCoords = [newCoords[0], newCoords[1]]
+      let health = this.health[newCoords]
+      let blockHealth = BLOCK_HEALTHS[this.grid[newCoords[0]][newCoords[1]]]
+      if (health !== blockHealth) {
+        let convertedCoords = coordsFunc(convertFromGrid(newCoords))
+        ctx.fillRect(convertedCoords[0] + 1, convertedCoords[1] + 1, (blockHealth - health) / blockHealth * BLOCK_WIDTH >> 0, BLOCK_WIDTH)
       }
     }
   }

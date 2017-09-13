@@ -35,7 +35,7 @@ export default class Component extends React.Component {
     return (
       <div style={{...{width: LEADERBOARD_SIZE[0], height: LEADERBOARD_SIZE[1]}, ...this.props.style}} className={this.props.className}>
         {sorted.map(([id, kills]) =>
-          <div key={id} style={{height: LEADERBOARD_ROW_HEIGHT + 'px'}} className={"row " + (window.id === id ? style.currentPlayer : '')}>
+          <div key={id} style={{height: LEADERBOARD_ROW_HEIGHT + 'px'}} className={" row " + (window.id === id ? style.currentPlayer : '')}>
             <div style={{fontSize: LEADERBOARD_ROW_HEIGHT + 'px'}}>{id}</div>
             <div style={{fontSize: LEADERBOARD_ROW_HEIGHT + 'px'}}>{kills}</div>
           </div>

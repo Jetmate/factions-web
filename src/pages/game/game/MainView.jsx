@@ -232,6 +232,7 @@ function draw (ctx, grid, player, opponents, bullets) {
   ctx.clearRect(0, 0, window.innerWidth, window.innerHeight)
 
   grid.draw(ctx, player.generateDisplayCoords)
+  grid.drawDamage(ctx, player.generateDisplayCoords)
   for (let id in bullets) {
     bullets[id].draw(ctx, player.generateDisplayCoords)
   }

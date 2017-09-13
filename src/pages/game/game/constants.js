@@ -83,4 +83,5 @@ export const
   OPPONENT_TEXT_OFFSET = FONT_SIZE + SCALE_FACTOR,
 
   DESTRUCTIBLE_BLOCKS = ['tree'],
-  BLOCK_HEALTHS = {tree: 10}
+  BLOCK_HEALTHS = {tree: 10},
+  BLOCK_DAMAGE_COLOR = 'rgba(250, 250, 250, .5)'
