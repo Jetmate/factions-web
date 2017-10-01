@@ -1,8 +1,9 @@
 import { BLOCK_WIDTH, REAL_BLOCK_WIDTH, SCALE_FACTOR, BLOCK_OUTLINE_COLOR, BLOCK_COLOR, BLOCK_OUTLINE_WIDTH, FLOOR_COLOR, TREE_COLOR, TREE_OUTLINE, WIDTH, HEIGHT, DESTRUCTIBLE_BLOCKS, BLOCK_HEALTHS, BLOCK_DAMAGE_COLOR } from '../constants.js'
 import { convertFromGrid } from '../helpers.js'
+import Thing from './Thing.js'
 
 export default class Grid {
-  constructor (grid, blockSprite, socket) {
+  constructor (grid, socket, itemSprites, items) {
     this.grid = grid
     this.width = grid.length
     this.height = grid[0].length
@@ -15,9 +16,12 @@ export default class Grid {
     this.ctx.webkitImageSmoothingEnabled = false
     this.ctx.mozImageSmoothingEnabled = false
     this.ctx.scale(SCALE_FACTOR, SCALE_FACTOR)
-    this.blockSprite = blockSprite
     this.socket = socket
     this.generateSprite()
+
+    this.items = []
+    this.itemSprites = itemSprites
+    items.forEach(item => this.spawnItem(item.x, item.y, item.type))
   }
 
   generateHealth (grid) {
@@ -135,7 +139,19 @@ export default class Grid {
         this.socket.emit('gridChange', x, y, '')
         this.changeBlock(x, y, '')
         delete this.health[[x, y]]
+        this.spawnItem(x, y, 'wood')
+        this.socket.emit('newItem', x, y, 'wood')
       }
+    }
+  }
+
+  spawnItem (x, y, type) {
+    this.items.push(new Thing(convertFromGrid([x, y]), this.itemSprites[type]))
+  }
+
+  drawItems (ctx, coordsFunc) {
+    for (let i = 0; i < this.items.length; i++) {
+      this.items[i].draw(ctx, coordsFunc)
     }
   }
 
@@ -148,7 +164,7 @@ export default class Grid {
       let blockHealth = BLOCK_HEALTHS[this.grid[newCoords[0]][newCoords[1]]]
       if (health !== blockHealth) {
         let convertedCoords = coordsFunc(convertFromGrid(newCoords))
-        ctx.fillRect(convertedCoords[0] + 1, convertedCoords[1] + 1, (blockHealth - health) / blockHealth * BLOCK_WIDTH >> 0, BLOCK_WIDTH)
+        ctx.fillRect(convertedCoords[0], convertedCoords[1] + 1, (blockHealth - health) / blockHealth * BLOCK_WIDTH >> 0, BLOCK_WIDTH)
       }
     }
   }

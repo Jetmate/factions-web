@@ -55,8 +55,6 @@ function init (ctx, socket, reduxDispatch) {
     const playerSprite = spriteSheet.getSprite(12, 8, true)
     const bulletStart = [10.5 * SCALE_FACTOR, 5 * SCALE_FACTOR]
     const bulletSprite = spriteSheet.getSprite(3, 4, true)
-    const blockSprite = spriteSheet.getSprite(16, 16, true)
-
     let player = new Player(
       convertFromGrid(JSON.parse(window.coords)),
       new SpriteManager(playerSprite),
@@ -70,7 +68,8 @@ function init (ctx, socket, reduxDispatch) {
 
     socket.emit('newPlayer', window.id, player.coords)
 
-    let grid = new Grid(JSON.parse(window.grid), blockSprite, socket)
+    const woodSprite = spriteSheet.getSprite(6, 4, true)
+    let grid = new Grid(JSON.parse(window.grid), socket, {wood: new SpriteManager(woodSprite)}, JSON.parse(window.items))
     let opponents = {}
     let bullets = {}
 
@@ -164,6 +163,10 @@ function initSocket (socket, player, opponents, bullets, bulletSprite, playerSpr
   socket.on('gridChange', (x, y, newType) => {
     grid.changeBlock(x, y, newType)
   })
+
+  socket.on('newItem', (x, y, type) => {
+    grid.spawnItem(x, y, type)
+  })
 }
 
 function initInput (player) {
@@ -233,6 +236,7 @@ function draw (ctx, grid, player, opponents, bullets) {
 
   grid.draw(ctx, player.generateDisplayCoords)
   grid.drawDamage(ctx, player.generateDisplayCoords)
+  grid.drawItems(ctx, player.generateDisplayCoords)
   for (let id in bullets) {
     bullets[id].draw(ctx, player.generateDisplayCoords)
   }
