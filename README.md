@@ -1,3 +1,3 @@
-### Fire Arcade :fire:
+### Factions web
 
-An arcade that specializes in real-time multiplayer games
+The web part of factions.io
